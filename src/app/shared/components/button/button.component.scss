@@ -1,0 +1,57 @@
+.button {
+    padding: 0.625rem 1.125rem;
+    gap: 0.5rem;
+    background-color: transparent;
+    color: var(--secondary-text-color);
+    font-weight: 600;
+    text-align: center;
+    touch-action: manipulation;
+    width: 100%;
+    height: 100%;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0.1rem solid transparent;
+    transition: border 0.3s ease-in-out;
+    border-radius: var(--full-radius);
+    white-space: nowrap;
+}
+
+.btn-cta {
+    background-color: var(--primary-color);
+    color: var(--primary-text-color);
+
+    &.clicked {
+        background-color: #9f1239;
+    }
+}
+
+.btn-primary {
+    background-color: var(--secondary-text-color);
+    color: var(--bg-color);
+    padding: 0.625rem 1.5rem;
+
+    &.clicked {
+        background-color: var(--third-text-color);
+    }
+}
+
+.btn-default {
+    background-color: #401f36;
+    color: var(--primary-text-color);
+
+    &.clicked {
+        background-color: #2a3548;
+    }
+}
+
+.btn-bordered {
+    border: 0.1rem solid var(--border-color);
+}
+
+@media only screen and (min-width: 768px) {
+    .button {
+        font-size: 1rem;
+    }
+}

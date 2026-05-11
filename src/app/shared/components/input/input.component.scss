@@ -1,0 +1,43 @@
+.input {
+    width: 100%;
+    border-radius: var(--light-radius);
+    height: 3rem;
+    color: var(--primary-text-color);
+    border: 0.1rem solid var(--border-color);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+
+    &.active {
+        border-color: var(--third-text-color);
+    }
+
+    &-icon {
+        height: 1.25rem;
+        color: var(--secondary-text-color);
+    }
+
+    & input {
+        border: none;
+        background-color: transparent;
+        width: 100%;
+        font-size: 1rem;
+        color: var(--primary-text-color);
+        outline: none;
+        font-weight: 400;
+    }
+
+    &-skeleton {
+        width: 100%;
+        height: 3rem;
+        background-color: rgba(84, 8, 12, 0.3);
+        animation: skeleton-loading 0.8s linear infinite alternate;
+        border-radius: var(--light-radius);
+        border: 0.1rem solid var(--border-color);
+    }
+
+    &.error {
+        border-color: var(--primary-color);
+    }
+}

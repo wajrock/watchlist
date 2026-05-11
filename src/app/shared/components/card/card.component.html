@@ -1,0 +1,21 @@
+<div class="card">
+    <img
+        [src]="'https://image.tmdb.org/t/p/w500' + info.mediaDetails.poster_path"
+        alt=""
+        class="card-cover"
+        (click)="openDetailsPopup()"
+        draggable="false"
+    />
+</div>
+
+@if (showDetailsPopup) {
+    <app-item-popup-details
+        [view]="view"
+        [contentType]="contentType"
+        [itemInfos]="info"
+        [animateOnInit]="animatePopup"
+        (close)="closeDetailsPopup()"
+        (addedToCollection)="handleAddItem()"
+        (updating)="handleUpdate()"
+    ></app-item-popup-details>
+}

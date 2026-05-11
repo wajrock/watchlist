@@ -1,0 +1,46 @@
+<app-popup (close)="close.emit()" class="new-watchlist-popup">
+    <div class="new-watchlist">
+        <div class="overlay"></div>
+        <div class="new-watchlist-content">
+            <h1 class="new-watchlist-title">Nouvelle Watchlist</h1>
+            <div class="new-watchlist-form">
+                <app-input
+                    type="text"
+                    name="watchlist-name"
+                    id="watchlist-name"
+                    placeholder="Nom de la watchlist"
+                    [autocapitalize]="true"
+                    [value]="newWatchlistName()"
+                    (onInput)="onNameInput($event)"
+                ></app-input>
+                <app-input-dropdown
+                    name="input-members"
+                    id="input-members"
+                    placeholder="Ajouter des membres"
+                    [options]="membersOptions()"
+                    titleOptions="Membres trouvés"
+                    (onOptionSelected)="addMember($event)"
+                    (onDropdownOpen)="isMembersListVisible.set(!$event)"
+                ></app-input-dropdown>
+                @if (isMembersListVisible()) {
+                    <div class="new-watchlist-members-list">
+                        @for (member of selectedMembers(); track $index) {
+                            <app-button customClass="btn-primary" (action)="removeMember(member)">
+                                &#64; {{ member.value }}
+                                <i class="fa-solid fa-xmark"></i>
+                            </app-button>
+                        }
+                    </div>
+                }
+            </div>
+            @if (newWatchlistName()) {
+                <app-button
+                    customClass="btn-cta"
+                    class="new-watchlist-action"
+                    (action)="createWatchlist()"
+                    >Créer la watchlist</app-button
+                >
+            }
+        </div>
+    </div>
+</app-popup>

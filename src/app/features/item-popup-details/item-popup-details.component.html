@@ -1,0 +1,128 @@
+<app-popup (close)="onClose()" [animateOnInit]="true">
+    <div class="media-details-popup">
+        <div class="backdrop-cover">
+            <img
+                [src]="this.imgBaseUrl + 'original' + this.itemInfos().mediaDetails.backdrop_path"
+                alt=""
+            />
+
+            <div class="backdrop-cover-overlay"></div>
+        </div>
+        <div class="content">
+            <img
+                class="backdrop-background"
+                [src]="this.imgBaseUrl + 'w300' + this.itemInfos().mediaDetails.backdrop_path"
+                alt=""
+            />
+            <div class="media-details-content">
+                @if (itemInfos().mediaDetails.logo.path) {
+                    <div class="media-logo">
+                        <img
+                            [src]="imgBaseUrl + 'original' + itemInfos().mediaDetails.logo.path"
+                            alt=""
+                        />
+                    </div>
+                } @else {
+                    <h1 class="media-title">{{ itemInfos().mediaDetails.title }}</h1>
+                }
+
+                @if ((view === 'search' && isDetailsRequestDone) || view === 'watchlist') {
+                    <div class="media-infos">
+                        <div class="media-infos-item">
+                            @if (contentType === 'movie') {
+                                <p>{{ duration | displayRuntime }}</p>
+                            } @else {
+                                <p>{{ numberSeasons | displaySeasonsNumber }}</p>
+                            }
+                        </div>
+
+                        <span>·</span>
+
+                        <div class="media-infos-item">
+                            <p>{{ genre | displayGenre }}</p>
+                        </div>
+
+                        @if (itemInfos().mediaDetails.release_date.length > 0) {
+                            <span>·</span>
+
+                            <div class="media-infos-item">
+                                <p>
+                                    {{ itemInfos().mediaDetails.release_date | displayDate }}
+                                </p>
+                            </div>
+                        }
+                    </div>
+                } @else {
+                    <div class="media-infos">
+                        <div class="media-infos-skeleton"></div>
+                        <div class="media-infos-skeleton"></div>
+                        <div class="media-infos-skeleton"></div>
+                    </div>
+                }
+
+                <div class="media-actions">
+                    <app-button customClass="btn-default" (action)="changeSeenStatus()">
+                        @if (hasMediaSeen()) {
+                            <i class="fa-solid fa-eye"></i>
+                        } @else {
+                            <i class="fa-solid fa-eye-slash"></i>
+                        }
+                    </app-button>
+                    @if (view === 'search') {
+                        <app-button customClass="btn-primary" (action)="addToCollection()">
+                            <i class="fa-solid fa-plus"></i>Ajouter</app-button
+                        >
+                        <app-button customClass="btn-default" (action)="changeSeenStatus()">
+                            <i class="fa-solid fa-play"></i
+                        ></app-button>
+                    } @else {
+                        <app-button customClass="btn-primary">
+                            <i class="fa-solid fa-play"></i> Bande-Annonce</app-button
+                        >
+                        <app-button customClass="btn-default">
+                            <i class="fa-solid fa-trash-can"></i
+                        ></app-button>
+                    }
+                </div>
+
+                <div class="media-details">
+                    <div class="media-details-header">Infos</div>
+                    @if (itemInfos().mediaDetails.overview.length > 0) {
+                        <div class="media-overview">
+                            <p>{{ itemInfos().mediaDetails.overview }}</p>
+                        </div>
+                        <div class="media-tags">
+                            @if (view === 'watchlist') {
+                                <div class="media-owner tag">
+                                    <p>{{ ownerName() }}</p>
+                                </div>
+                            }
+
+                            @if (itemInfos().mediaDetails.vote_average > 0) {
+                                <div class="media-grade tag">
+                                    <i class="fa-regular fa-star"></i>
+                                    <p>
+                                        {{ itemInfos().mediaDetails.vote_average | displayRate }}
+                                    </p>
+                                </div>
+                            }
+
+                            @if (
+                                (view === 'search' && isProviderRequestDone) || view === 'watchlist'
+                            ) {
+                                @if (provider !== 'Inconnu') {
+                                    <div class="media-platform tag">
+                                        <i class="fa-solid fa-tv"></i>
+                                        <p>{{ provider | displayProvider }}</p>
+                                    </div>
+                                }
+                            } @else {
+                                <div class="media-platform-skeleton"></div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</app-popup>

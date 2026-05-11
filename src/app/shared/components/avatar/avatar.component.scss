@@ -1,0 +1,22 @@
+.avatar {
+    height: 100%;
+    aspect-ratio: 1;
+    border: 0.1rem solid var(--border-color);
+    border-radius: var(--full-radius);
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.avatar-pp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--full-radius);
+    color: var(--secondary-text-color);
+    font-weight: 600;
+    height: 90%;
+    aspect-ratio: 1;
+    background-color: #401f36;
+    font-size: 120%;
+}

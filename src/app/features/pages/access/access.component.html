@@ -1,0 +1,88 @@
+<div class="access page">
+    <div class="overlay"></div>
+    <div class="access-content">
+        <div class="access-header">
+            <app-button class="btn-back" customClass="btn-default btn-bordered" (action)="goBack()"
+                ><i class="fa-solid fa-arrow-left"></i
+            ></app-button>
+        </div>
+        <h1 class="page-title">{{ titlePage() }}</h1>
+        <form class="access-form">
+            <app-input
+                placeholder="Entre ton identifiant"
+                name="username"
+                type="text"
+                id="username"
+                [spellcheck]="false"
+                [autocorrect]="false"
+                [autocapitalize]="false"
+                [disabled]="view() !== ACCESS_VIEW.DEFAULT"
+                (onInput)="onUsernameInput($event)"
+            ></app-input>
+            @if (view() === ACCESS_VIEW.KNOWN_USER) {
+                <app-input
+                    placeholder="Entre ton mot de passe"
+                    name="password"
+                    type="password"
+                    id="password"
+                    (onInput)="onPasswordInput($event)"
+                    [hasErrorMessage]="formErrorMessage() !== null"
+                    [autocomplete]="'current-password'"
+                ></app-input>
+            }
+            @if (view() === ACCESS_VIEW.NEW_USER) {
+                <app-input
+                    placeholder="Entre ton nom"
+                    name="name"
+                    type="text"
+                    id="name"
+                    [spellcheck]="false"
+                    [autocorrect]="false"
+                    [autocapitalize]="true"
+                    (onInput)="onNameInput($event)"
+                ></app-input>
+                <app-input
+                    placeholder="Entre un mot de passe"
+                    name="new-password"
+                    type="password"
+                    id="new-password"
+                    [spellcheck]="false"
+                    [autocorrect]="false"
+                    [autocapitalize]="false"
+                    (onInput)="onPasswordInput($event)"
+                    [autocomplete]="'new-password'"
+                ></app-input>
+                <app-input
+                    placeholder="Confirme ton mot de passe"
+                    name="confirm-password"
+                    type="password"
+                    id="confirm-password"
+                    [spellcheck]="false"
+                    [autocorrect]="false"
+                    [autocapitalize]="false"
+                    (onInput)="onConfirmPasswordInput($event)"
+                ></app-input>
+            }
+        </form>
+        @if (formErrorMessage()) {
+            <p class="form-error">{{ formErrorMessage() }}</p>
+        }
+        @if (view() === ACCESS_VIEW.DEFAULT && isUsernameEntered()) {
+            <app-button customClass="btn-primary" class="access-action" (action)="checkUsername()"
+                >Continuer</app-button
+            >
+        }
+
+        @if (view() === ACCESS_VIEW.KNOWN_USER && isPasswordEntered()) {
+            <app-button customClass="btn-primary" class="access-action" (action)="login()"
+                >Se connecter</app-button
+            >
+        }
+
+        @if (view() === ACCESS_VIEW.NEW_USER && isNameEntered() && arePasswordsIdentical()) {
+            <app-button customClass="btn-primary" class="access-action" (action)="signup()"
+                >S'inscrire</app-button
+            >
+        }
+    </div>
+</div>

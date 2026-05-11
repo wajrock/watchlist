@@ -1,0 +1,15 @@
+.dropdown {
+    color: var(--secondary-text-color);
+}
+
+.dropdown-field {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 1.25rem;
+    font-weight: 500;
+
+    & svg {
+        height: 0.6rem;
+    }
+}

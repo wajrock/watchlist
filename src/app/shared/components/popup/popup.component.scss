@@ -1,0 +1,80 @@
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    background-color: rgba(27, 30, 39, 0.9);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+}
+
+.popup {
+    width: 100%;
+    max-width: 28rem;
+    background-color: var(--bg-color);
+    border-radius: 2rem 2rem 0 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+    display: flex;
+    outline: 0.1rem solid var(--border-color);
+
+    &.animate {
+        animation: slideInUp 0.5s ease;
+    }
+
+    &-close {
+        position: absolute;
+        z-index: 999999;
+        right: 1rem;
+        top: 1rem;
+
+        &::ng-deep .button {
+            width: 2.25rem !important;
+            height: 2.25rem !important;
+            padding: 0 !important;
+            font-size: 1.125rem !important;
+
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px) brightness(0.8);
+            -webkit-backdrop-filter: blur(12px) brightness(0.8);
+
+            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+
+            &:active {
+                transform: scale(0.9);
+                background: rgba(255, 255, 255, 0.2);
+            }
+        }
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .popup-overlay {
+        align-items: center;
+        justify-content: center;
+    }
+    .popup {
+        border-radius: 2rem;
+        &.animate {
+            animation: fadeIn 0.4s ease;
+        }
+    }
+
+    .popup-pill {
+        display: none;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    .popup {
+        max-width: 35rem;
+    }
+}

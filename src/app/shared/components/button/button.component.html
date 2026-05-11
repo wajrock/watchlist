@@ -1,0 +1,11 @@
+<div
+    class="button"
+    [ngClass]="[customClass]"
+    [class.clicked]="isClicked"
+    (touchstart)="isClicked = true"
+    (touchcancel)="isClicked = false"
+    (touchend)="handleTouchEnd()"
+    (click)="handleClick()"
+>
+    <ng-content></ng-content>
+</div>

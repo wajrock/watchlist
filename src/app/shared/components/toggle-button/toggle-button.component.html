@@ -1,0 +1,24 @@
+<div class="toggle-button">
+    @for (option of options; track option.id) {
+        <div
+            class="toggle-button-item"
+            [class.selected]="itemSelected === $index"
+            [ngClass]="[type]"
+            [class.border]="border"
+            (click)="swichPositionHover($index, true)"
+            [style]="{
+                width: size === 'small' ? '4.5rem' : size === 'medium' ? '5.5rem' : '6.5rem',
+            }"
+        >
+            <p class="toggle-button-item-text">{{ option.value }}</p>
+        </div>
+    }
+    <div
+        #hover
+        class="hover"
+        [style]="{
+            width: size === 'small' ? '4.5rem' : size === 'medium' ? '5.5rem' : '6.5rem',
+        }"
+        [ngClass]="[type]"
+    ></div>
+</div>

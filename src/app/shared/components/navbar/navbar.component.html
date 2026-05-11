@@ -1,0 +1,16 @@
+<div class="navbar-wrapper">
+    
+    <div class="navbar-wrapper-tabs">
+        <div class="navbar-wrapper-tabs-overlay"></div>
+        <div class="navbar-wrapper-tabs-active" #active></div>
+        <div class="navbar-wrapper-tabs-item" (click)="swichPositionHover('watchlist')">
+            <i class="fa-solid fa-tv"></i>
+        </div>
+        <div class="navbar-wrapper-tabs-item" (click)="swichPositionHover('search')">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+        <div class="navbar-wrapper-tabs-item" (click)="swichPositionHover('profile')">
+                <p class="username">{{ user === 1 ? 'M' : 'A' }}</p>
+        </div>
+    </div>
+</div>
