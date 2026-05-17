@@ -38,16 +38,24 @@
 }
 
 .btn-default {
-    background-color: #401f36;
+    background-color: var(--default-btn-color);
     color: var(--primary-text-color);
 
     &.clicked {
-        background-color: #2a3548;
+        background-color: var(--default-btn-hover-color);
     }
 }
 
 .btn-bordered {
     border: 0.1rem solid var(--border-color);
+
+    &-active {
+        border-color: var(--secondary-text-color);
+    }
+}
+
+.btn-square {
+    border-radius: var(--light-radius);
 }
 
 @media only screen and (min-width: 768px) {

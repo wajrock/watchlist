@@ -1,14 +1,14 @@
 <div class="input-dropdown">
-    <app-input
+    <app-searchbar
         class="input"
         type="text"
-        [name]="name()"
-        [id]="id()"
+        [inputName]="name()"
+        [inputId]="id()"
+        [searchValue]="value()"
         [placeholder]="placeholder()"
-        [value]="value()"
-        (onInput)="onValueInput($event)"
+        (onSearchChanged)="onValueInput($event)"
         [autocapitalize]="false"
-    ></app-input>
+    ></app-searchbar>
 
     @if (isOptionsVisible() && filteredOptions().length > 0) {
         <div class="input-dropdown-content">

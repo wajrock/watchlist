@@ -1,3 +1,7 @@
 <div class="avatar">
-    <div class="avatar-pp">{{ initials() }}</div>
+    <div class="avatar-pp">{{ initialsLoggedUser() }}</div>
+    @let watchlistInvitations = this.watchlistInvitations();
+    @if (showBadge() && watchlistInvitations && watchlistInvitations.length > 0) {
+        <div class="invitations-badge">{{ watchlistInvitations.length }}</div>
+    }
 </div>

@@ -24,10 +24,6 @@
             display: block;
         }
 
-        &-text {
-            z-index: 2;
-        }
-
         &.selected {
             &.cta {
                 color: var(--primary-text-color);
@@ -54,7 +50,6 @@
     top: 0;
     left: 0;
     height: 100%;
-    z-index: 1;
     border: 0.1rem solid var(--border-color);
     transition: transform 0.3s ease;
     &.cta {

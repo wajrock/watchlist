@@ -1,0 +1,24 @@
+.invitation {
+    display: flex;
+    align-items: center;
+    border-radius: var(--full-radius);
+    border: 0.1rem solid var(--border-color);
+    padding: 0.25rem 0.5rem 0.25rem 1rem;
+    justify-content: space-between;
+
+    .watchlist {
+        color: var(--primary-text-color);
+        font-size: 1.125rem;
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.25rem;
+
+        &::ng-deep .button {
+            width: 2.25rem;
+            height: 2.25rem;
+            padding: 0 !important;
+        }
+    }
+}

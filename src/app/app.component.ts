@@ -1,23 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import {NavbarComponent} from './shared/components/navbar/navbar.component';
+import { RouterOutlet } from '@angular/router';
+import { Toast, TOAST_TYPE } from './shared/models/toast.model';
+import { ToastService } from './shared/services/toast/toast.service';
+import { ToastComponent } from './shared/components/toast/toast.component';
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, ReactiveFormsModule, CommonModule, NavbarComponent],
+    imports: [RouterOutlet, ReactiveFormsModule, CommonModule, ToastComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })
 export class AppComponent {
+    private toastService = inject(ToastService);
+
     title = 'watch-app';
-    showNavbar = true;
-    constructor(private router: Router) {
-        this.router.events.subscribe((event) => {
-            if (event instanceof NavigationEnd) {
-                const showOnRoutes = ['/', '/search', '/profile'];
-                this.showNavbar = showOnRoutes.includes(event.urlAfterRedirects);
-            }
-        });
-    }
+
+    readonly currentToast = this.toastService.currentToast;
 }

@@ -1,0 +1,32 @@
+@let mediaDetails = this.mediaDetails();
+<div class="media-infos">
+    <div class="media-infos-header">Infos</div>
+    @if (mediaDetails.overview.length > 0) {
+        <div class="media-overview">
+            <p>{{ mediaDetails.overview }}</p>
+        </div>
+    }
+    <div class="media-tags">
+        @if (view() === PAGE_VIEW_TYPE.WATCHLIST) {
+            <div class="media-owner tag">
+                <p>{{ ownerName() }}</p>
+            </div>
+        }
+
+        @if (mediaDetails.voteAverage > 0) {
+            <div class="media-grade tag">
+                <i class="fa-regular fa-star"></i>
+                <p>
+                    {{ mediaDetails.voteAverage | displayRate }}
+                </p>
+            </div>
+        }
+
+        @if (mediaDetails.provider) {
+            <div class="media-platform tag">
+                <i class="fa-solid fa-tv"></i>
+                <p>{{ mediaDetails.provider | displayProvider }}</p>
+            </div>
+        }
+    </div>
+</div>

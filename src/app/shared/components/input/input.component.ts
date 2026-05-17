@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 
 @Component({
     selector: 'app-input',
@@ -18,6 +18,8 @@ export class InputComponent {
     autocomplete = input<string>('');
     disabled = input<boolean>(false);
     hasErrorMessage = input<boolean>(false);
+
+    isInputActive = signal<boolean>(false);
 
     onInput = output<Event>();
 }

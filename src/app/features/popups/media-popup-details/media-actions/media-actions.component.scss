@@ -1,0 +1,32 @@
+.media-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 16rem;
+    --height: 3rem;
+
+    &::ng-deep {
+        .button {
+            font-size: 1rem !important;
+        }
+        .btn-default {
+            height: var(--height);
+            width: var(--height);
+        }
+    }
+
+    &::ng-deep .btn-default {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+.media-grades {
+    position: relative;
+    display: flex;
+    gap: 0.25rem;
+
+    &::ng-deep .button {
+        height: var(--height);
+        width: var(--height);
+    }
+}

@@ -1,0 +1,253 @@
+import { EnvironmentInjector, inject, Injectable, runInInjectionContext } from '@angular/core';
+import {
+    Firestore,
+    collection,
+    addDoc,
+    collectionData,
+    deleteDoc,
+    doc,
+    updateDoc,
+    getDocs,
+    query,
+    where,
+    getDoc,
+    writeBatch,
+    docData,
+    deleteField,
+    arrayUnion,
+} from '@angular/fire/firestore';
+import { catchError, combineLatest, from, map, Observable, of, switchMap } from 'rxjs';
+import * as bcrypt from 'bcryptjs';
+import {
+    WatchlistItem,
+    Member,
+    ApiMedia,
+    WatchlistMediaAdd,
+    WatchlistMediaCollection,
+    MergedMedia,
+    CollectionMedia,
+    GRADE,
+} from '../../models/firebase.models';
+
+@Injectable({
+    providedIn: 'root',
+})
+export class CollectionService {
+    private firestore = inject(Firestore);
+
+    getWatchlists(userId: string): Observable<WatchlistItem[]> {
+        const watchlistsRef = collection(this.firestore, 'watchlists');
+        const q = query(watchlistsRef, where('members', 'array-contains', userId));
+        return collectionData(q, { idField: 'id' }) as Observable<WatchlistItem[]>;
+    }
+
+    addWatchlist(watchlistName: string, members: Member[]): Observable<WatchlistItem> {
+        const watchlistsRef = collection(this.firestore, 'watchlists');
+        const watchlist = {
+            name: watchlistName,
+            creationTime: new Date().toISOString(),
+            members: members,
+            medias: [],
+        };
+        return from(addDoc(watchlistsRef, watchlist)).pipe(
+            map((docRef) => ({
+                uidWatchlist: docRef.id,
+                creationTime: watchlist.creationTime,
+                name: watchlist.name,
+                members: watchlist.members,
+                medias: watchlist.medias,
+            })),
+        );
+    }
+
+    // async migrateMediasCollection() {
+    //     const mediasRef = collection(this.firestore, 'medias');
+    //     const snapshot = await getDocs(mediasRef);
+    //     const batch = writeBatch(this.firestore);
+
+    //     let count = 0;
+
+    //     snapshot.docs.forEach((doc) => {
+    //         const data = doc.data();
+
+    //         // On vérifie si l'ancien champ 'id' existe encore
+    //         if (data['id'] !== undefined) {
+    //             const docRef = doc.ref;
+
+    //             batch.update(docRef, {
+    //                 // On s'assure que apiId prend la valeur de l'ancien id
+    //                 apiId: data['id'],
+    //                 // On supprime physiquement le champ 'id'
+    //                 id: deleteField(),
+    //             });
+    //             count++;
+    //         }
+    //     });
+
+    //     if (count > 0) {
+    //         await batch.commit();
+    //         console.log(`${count} documents mis à jour avec succès.`);
+    //     } else {
+    //         console.log('Aucun document à migrer.');
+    //     }
+    // }
+
+    checkIfMediaAlreadyInDB(apiId: number, mediaType: string): Observable<string | null> {
+        const filmsRef = collection(this.firestore, 'medias');
+
+        const q = query(filmsRef, where('apiId', '==', apiId), where('type', '==', mediaType));
+
+        return from(getDocs(q)).pipe(
+            map((snapshot) => {
+                if (snapshot.docs.length > 0) {
+                    return snapshot.docs[0].id;
+                }
+                return null;
+            }),
+        );
+    }
+
+    addMediaToWatchlist(
+        watchlistId: string,
+        apiMedia: ApiMedia,
+        mediaWatchlistInfos: WatchlistMediaAdd,
+    ): Observable<boolean> {
+        const mediasRef = collection(this.firestore, 'medias');
+        const watchlistDocRef = doc(this.firestore, `watchlists/${watchlistId}`);
+
+        return this.checkIfMediaAlreadyInDB(apiMedia.id, apiMedia.type).pipe(
+            switchMap((mediaIdFromCollection) => {
+                if (mediaIdFromCollection) {
+                    return this.updateWatchlistArray(
+                        watchlistDocRef,
+                        mediaIdFromCollection,
+                        mediaWatchlistInfos,
+                    );
+                } else {
+                    return from(addDoc(mediasRef, apiMedia)).pipe(
+                        switchMap((newMediaRef) => {
+                            return this.updateWatchlistArray(
+                                watchlistDocRef,
+                                newMediaRef.id,
+                                mediaWatchlistInfos,
+                            );
+                        }),
+                    );
+                }
+            }),
+            map(() => true),
+            catchError((error) => {
+                console.error("Erreur lors de l'ajout :", error);
+                return of(false);
+            }),
+        );
+    }
+
+    private updateWatchlistArray(
+        watchlistRef: any,
+        mediaId: string,
+        infos: WatchlistMediaAdd,
+    ): Observable<void> {
+        const newEntry: WatchlistMediaCollection = {
+            idMedia: mediaId,
+            ...infos,
+        };
+
+        return from(
+            updateDoc(watchlistRef, {
+                medias: arrayUnion(newEntry),
+            }),
+        );
+    }
+
+    updateMediaSeenStatus(
+        watchlistId: string,
+        idMedia: string,
+        isSeen: boolean,
+    ): Observable<boolean> {
+        const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
+
+        return from(getDoc(watchlistRef)).pipe(
+            switchMap((snapshot) => {
+                const data = snapshot.data() as WatchlistItem;
+                if (!snapshot.exists() || !data.medias) return of(false);
+
+                const medias = data.medias.map((m) =>
+                    m.idMedia === idMedia ? { ...m, isSeen } : m,
+                );
+
+                return from(updateDoc(watchlistRef, { medias })).pipe(map(() => true));
+            }),
+            catchError(() => of(false)),
+        );
+    }
+
+    updateMediaGrade(watchlistId: string, idMedia: string, grade: GRADE): Observable<boolean> {
+        const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
+
+        return from(getDoc(watchlistRef)).pipe(
+            switchMap((snapshot) => {
+                const data = snapshot.data() as WatchlistItem;
+                if (!snapshot.exists() || !data.medias) return of(false);
+
+                const medias = data.medias.map((m) =>
+                    m.idMedia === idMedia ? { ...m, grade: grade } : m,
+                );
+
+                return from(updateDoc(watchlistRef, { medias })).pipe(map(() => true));
+            }),
+            catchError(() => of(false)),
+        );
+    }
+
+    updateMemberInvitation(
+        watchlistId: string,
+        idMember: string,
+        joinWatchlist: boolean,
+    ): Observable<boolean> {
+        const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
+
+        return from(getDoc(watchlistRef)).pipe(
+            switchMap((snapshot) => {
+                const data = snapshot.data() as WatchlistItem;
+                if (!snapshot.exists() || !data.medias) return of(false);
+
+                let members: Member[];
+
+                if (joinWatchlist) {
+                    members = data.members.map((m) =>
+                        m.id === idMember ? { ...m, invitationAccepted: true } : m,
+                    );
+                } else {
+                    members = data.members.filter((m) => m.id !== idMember);
+                }
+
+                return from(updateDoc(watchlistRef, { members })).pipe(map(() => true));
+            }),
+            catchError(() => of(false)),
+        );
+    }
+
+    removeMediaFromWatchlist(watchlistId: string, idMedia: string): Observable<boolean> {
+        const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
+
+        return from(getDoc(watchlistRef)).pipe(
+            switchMap((snapshot) => {
+                if (!snapshot.exists()) return of(false);
+
+                const data = snapshot.data() as WatchlistItem;
+                const medias = data.medias || [];
+
+                const updatedMedias = medias.filter((m) => m.idMedia !== idMedia);
+
+                return from(updateDoc(watchlistRef, { medias: updatedMedias })).pipe(
+                    map(() => true),
+                );
+            }),
+            catchError((err) => {
+                console.error('Erreur lors de la suppression :', err);
+                return of(false);
+            }),
+        );
+    }
+}

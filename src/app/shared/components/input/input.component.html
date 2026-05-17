@@ -1,4 +1,4 @@
-<div class="input">
+<div class="input" [class.active]="isInputActive()">
     <input
         #usernameInput
         [type]="type()"
@@ -12,5 +12,7 @@
         [class.error]="hasErrorMessage()"
         [autocomplete]="autocomplete()"
         (input)="onInput.emit($event)"
+        (focus)="isInputActive.set(true)"
+        (blur)="isInputActive.set(false)"
     />
 </div>

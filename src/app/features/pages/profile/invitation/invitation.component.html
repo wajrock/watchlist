@@ -1,0 +1,11 @@
+<div class="invitation">
+    <div class="watchlist">{{ watchlistName() }}</div>
+    <div class="actions">
+        <app-button class="action" customClass="btn-primary" (action)="acceptInvitation.emit()">
+            <i class="fa-solid fa-check"></i>
+        </app-button>
+        <app-button class="action" customClass="btn-default" (action)="declineInvitation.emit()">
+            <i class="fa-solid fa-xmark"></i>
+        </app-button>
+    </div>
+</div>

@@ -1,0 +1,111 @@
+<div class="profile page">
+    <div class="overlay"></div>
+    <div class="profile-header">
+        <app-button customClass="btn-default btn-bordered" (action)="goBack()">
+            <i class="fa-solid fa-arrow-left"></i>
+        </app-button>
+        <app-button customClass="btn-default btn-bordered" (action)="logOut()">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </app-button>
+    </div>
+    <div class="profile-infos">
+        <div class="profile-avatar"><app-avatar></app-avatar></div>
+
+        <div class="profile-name">{{ user()?.name }}</div>
+        <div class="profile-username">&#64;{{ user()?.username }}</div>
+    </div>
+
+    @let watchlistInvitations = this.watchlistInvitations();
+    @let medias = this.medias();
+
+    @if (
+        (watchlistInvitations && watchlistInvitations.length > 0) || (medias && medias.length > 0)
+    ) {
+        <div class="profile-content">
+            <div class="profile-tabs">
+                @if (watchlistInvitations && watchlistInvitations.length > 0) {
+                    <div
+                        class="profile-tab"
+                        [class.active]="activeView() === PROFILE_SECTION_VIEW.INVITATIONS"
+                        (click)="view.set(PROFILE_SECTION_VIEW.INVITATIONS)"
+                    >
+                        Invitations
+                    </div>
+                }
+                @if (medias && medias.length > 0) {
+                    <div
+                        class="profile-tab"
+                        [class.active]="activeView() === PROFILE_SECTION_VIEW.HISTORY"
+                        (click)="view.set(PROFILE_SECTION_VIEW.HISTORY)"
+                    >
+                        Historique
+                    </div>
+                }
+            </div>
+            @if (activeView() === PROFILE_SECTION_VIEW.INVITATIONS) {
+                <div class="invitations">
+                    @for (
+                        watchlistInvitation of watchlistInvitations;
+                        track watchlistInvitation.uidWatchlist
+                    ) {
+                        <app-invitation
+                            [watchlistName]="watchlistInvitation.name"
+                            (acceptInvitation)="
+                                handleInvitation(watchlistInvitation.uidWatchlist, true)
+                            "
+                            (declineInvitation)="
+                                handleInvitation(watchlistInvitation.uidWatchlist, false)
+                            "
+                        ></app-invitation>
+                    }
+                </div>
+            }
+            @if (activeView() === PROFILE_SECTION_VIEW.HISTORY) {
+                <div class="history">
+                    <div class="history-tags">
+                        @let movieMediasCount = this.movieMediasCount();
+                        @let seriesMediasCount = this.seriesMediasCount();
+                        @let likeMediasCount = this.likeMediasCount();
+                        @let loveMediasCount = this.loveMediasCount();
+
+                        @if (movieMediasCount && movieMediasCount > 0) {
+                            <div
+                                class="history-tag"
+                                [class.active]="historyFilter() === CONTENT_TYPE.MOVIE"
+                            >
+                                Films
+                            </div>
+                        }
+
+                        @if (seriesMediasCount && seriesMediasCount > 0) {
+                            <div
+                                class="history-tag"
+                                [class.active]="historyFilter() === CONTENT_TYPE.TV"
+                            >
+                                Séries
+                            </div>
+                        }
+
+                        @if (likeMediasCount && likeMediasCount > 0) {
+                            <div
+                                class="history-tag"
+                                [class.active]="historyFilter() === GRADE.LOVE"
+                            >
+                                J'aime
+                            </div>
+                        }
+
+                        @if (loveMediasCount && loveMediasCount > 0) {
+                            <div class="history-tag">J'adore</div>
+                        }
+                    </div>
+                    <div class="history-grid">
+                        @for (media of medias; track media.uidMedia) {
+                            <app-card [posterPath]="media.mediaDetails.posterPath"></app-card>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,37 @@
+<app-popup (close)="close.emit()">
+    <div class="new-members">
+        <div class="overlay"></div>
+        <div class="new-members-content">
+            <h1 class="new-members-title">Inviter des amis</h1>
+            <div class="new-members-search">
+                <app-input-dropdown
+                    name="input-new-members"
+                    id="input-new-members"
+                    placeholder="Rechercher des amis"
+                    [options]="membersOptions()"
+                    titleOptions="Amis trouvés"
+                    (onOptionSelected)="addMember($event)"
+                    (onDropdownOpen)="isMembersListVisible.set(!$event)"
+                ></app-input-dropdown>
+                @if (isMembersListVisible()) {
+                    <div class="new-members-list">
+                        @for (member of selectedMembers(); track $index) {
+                            <app-button customClass="btn-primary" (action)="removeMember(member)">
+                                &#64; {{ member.value }}
+                                <i class="fa-solid fa-xmark"></i>
+                            </app-button>
+                        }
+                    </div>
+                }
+            </div>
+            @if (selectedMembers().length > 0) {
+                <app-button
+                    class="members-invite"
+                    customClass="btn-primary"
+                    (action)="updateMembersList()"
+                    ><i class="fa-solid fa-users"></i>Inviter</app-button
+                >
+            }
+        </div>
+    </div>
+</app-popup>

@@ -1,0 +1,72 @@
+<app-popup (close)="close.emit()" class="new-watchlist-popup">
+    <div class="new-watchlist">
+        <div class="overlay"></div>
+        <div class="new-watchlist-content">
+            <h1 class="new-watchlist-title">
+                {{ view() === NEW_WATCHLIST_VIEW.NAME ? 'Nouvelle Watchlist' : newWatchlistName() }}
+            </h1>
+            <div class="new-watchlist-form">
+                @if (view() === NEW_WATCHLIST_VIEW.NAME) {
+                    <app-input
+                        type="text"
+                        name="watchlist-name"
+                        id="watchlist-name"
+                        placeholder="Entre un nom"
+                        [autocapitalize]="true"
+                        [value]="newWatchlistName()"
+                        (onInput)="onNameInput($event)"
+                    ></app-input>
+                }
+                @if (view() === NEW_WATCHLIST_VIEW.MEMBERS) {
+                    <app-input-dropdown
+                        name="input-members"
+                        id="input-members"
+                        placeholder="Rechercher des amis"
+                        [options]="membersOptions()"
+                        titleOptions="Amis trouvés"
+                        (onOptionSelected)="addMember($event)"
+                        (onDropdownOpen)="isMembersListVisible.set(!$event)"
+                    ></app-input-dropdown>
+                    @if (isMembersListVisible()) {
+                        <div class="new-watchlist-members-list">
+                            @for (member of selectedMembers(); track $index) {
+                                <app-button
+                                    customClass="btn-primary"
+                                    (action)="removeMember(member)"
+                                >
+                                    &#64; {{ member.value }}
+                                    <i class="fa-solid fa-xmark"></i>
+                                </app-button>
+                            }
+                        </div>
+                    }
+                }
+            </div>
+            @if (showCreationButton()) {
+                <div class="new-watchlist-actions">
+                    <app-button
+                        customClass="btn-primary"
+                        class="new-watchlist-action"
+                        (action)="createWatchlist()"
+                        >Créer la watchlist</app-button
+                    >
+                    @if (view() === NEW_WATCHLIST_VIEW.NAME) {
+                        <app-button
+                            customClass="btn-default btn-bordered"
+                            class="new-watchlist-action"
+                            (action)="view.set(NEW_WATCHLIST_VIEW.MEMBERS)"
+                            >Inviter des amis</app-button
+                        >
+                    } @else {
+                        <app-button
+                            customClass="btn-default btn-bordered"
+                            class="new-watchlist-action"
+                            (action)="view.set(NEW_WATCHLIST_VIEW.NAME)"
+                            >Retour</app-button
+                        >
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</app-popup>

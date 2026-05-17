@@ -1,0 +1,65 @@
+@let mediaDetails = this.mediaDetails();
+@let mediaSeenStatus = this.mediaSeenStatus();
+@let mediaGrade = this.mediaGrade();
+<app-popup (close)="onClose()" [animateOnInit]="true">
+    <div class="media-details-popup">
+        @if (mediaDetails && mediaSeenStatus !== null && mediaGrade !== null) {
+            <div class="backdrop-cover">
+                <img [src]="`${IMG_BASE_URL}/w1280${mediaDetails.backdropPath}`" alt="" />
+
+                <div class="backdrop-cover-overlay"></div>
+            </div>
+            <div class="content">
+                <img
+                    class="backdrop-background"
+                    [src]="`${IMG_BASE_URL}/w300${mediaDetails.backdropPath}`"
+                    alt=""
+                />
+                <div class="media-details-content">
+                    <app-media-logo [mediaDetails]="mediaDetails"></app-media-logo>
+
+                    <app-media-tags
+                        [mediaDetails]="mediaDetails"
+                        [contentType]="contentType()"
+                    ></app-media-tags>
+
+                    <app-media-actions
+                        [view]="view()"
+                        [mediaDetails]="mediaDetails"
+                        [mediaSeenStatus]="mediaSeenStatus"
+                        [mediaGrade]="mediaGrade"
+                        [actionsView]="actionsView()"
+                        (add)="addToCollection()"
+                        (remove)="removeFromCollection()"
+                        (updateSeenStatus)="changeSeenStatus()"
+                        (openTrailer)="showTrailer.set(true)"
+                        (updateGrade)="changeGrade($event)"
+                        (changeActionsView)="changeActionsView($event)"
+                    >
+                    </app-media-actions>
+
+                    @if (
+                        mediaDetails.overview.length > 0 ||
+                        mediaDetails.voteAverage > 0 ||
+                        mediaDetails.provider
+                    ) {
+                        <app-media-infos
+                            [view]="view()"
+                            [mediaDetails]="mediaDetails"
+                            [ownerName]="ownerName()"
+                        ></app-media-infos>
+                    }
+                </div>
+            </div>
+        } @else {
+            <div class="media-details-skeleton"></div>
+        }
+    </div>
+</app-popup>
+
+@if (showTrailer() && mediaDetails && mediaDetails.trailer) {
+    <app-trailer
+        [trailerKey]="mediaDetails.trailer"
+        (onClose)="showTrailer.set(false)"
+    ></app-trailer>
+}

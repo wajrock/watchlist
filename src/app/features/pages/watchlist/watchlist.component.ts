@@ -1,39 +1,30 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import {
-    ChangeDetectorRef,
-    Component,
-    computed,
-    ElementRef,
-    HostListener,
-    inject,
-    OnInit,
-    signal,
-    ViewChild,
-} from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import {
-    CONTENT_TYPE,
-    EnrichedMedia,
-    EnrichedWatchlist,
-    MergedMedia,
-    ParamOptions,
-    User,
-    VIEW_TYPE,
-    WatchlistItem,
-} from '../../../shared/models';
-import { CollectionService } from '../../../shared/services/collection.service';
-import { UsersService } from '../../../shared/services/users.service';
-import { NewWatchlistPopupComponent } from '../../new-watchlist-popup/new-watchlist-popup.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
-import { ItemPopupDetailsComponent } from '../../item-popup-details/item-popup-details.component';
-import { AuthService } from '../../../shared/services/auth.service';
-import { WatchlistService } from '../../../shared/services/watchlist.service';
+
+import { EnrichedMedia, MergedMedia, WatchlistItem } from '../../../shared/models/firebase.models';
+import {
+    CardInfo,
+    CONTENT_TYPE,
+    CONTENT_VIEW_TYPE,
+    PAGE_VIEW_TYPE,
+    POPUP,
+} from '../../../shared/models/models';
+import { WatchlistMembersCountPipe } from '../../../shared/pipes/watchlist-members-count.pipe';
+import { AuthService } from '../../../shared/services/auth/auth.service';
+import { FilterService } from '../../../shared/services/filter/filter.service';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
+import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
+import { NewWatchlistPopupComponent } from '../../popups/new-watchlist-popup/new-watchlist-popup.component';
+import { WatchlistsPopupComponent } from '../../popups/watchlists-popup/watchlists-popup.component';
+import { WatchlistMembersPopupComponent } from '../../popups/watchlist-members-popup/watchlist-members-popup.component';
+import { MembersPopupComponent } from '../../popups/members-popup/members-popup.component';
+import { AddMembersPopupComponent } from '../../popups/add-members-popup/add-members-popup.component';
 
 @Component({
     selector: 'app-watchlist',
@@ -42,9 +33,13 @@ import { WatchlistService } from '../../../shared/services/watchlist.service';
         CommonModule,
         AvatarComponent,
         NewWatchlistPopupComponent,
-        ItemPopupDetailsComponent,
+        MediaPopupDetailsComponent,
         CardComponent,
+        WatchlistsPopupComponent,
+        MembersPopupComponent,
+        AddMembersPopupComponent,
     ],
+    providers: [WatchlistMembersCountPipe],
     templateUrl: './watchlist.component.html',
     styleUrl: './watchlist.component.scss',
     animations: [
@@ -65,167 +60,151 @@ import { WatchlistService } from '../../../shared/services/watchlist.service';
         ]),
     ],
 })
-export class WatchlistComponent implements OnInit {
+export class WatchlistComponent {
     // INTERFACES
     readonly CONTENT_TYPE = CONTENT_TYPE;
-    readonly VIEW_TYPE = VIEW_TYPE;
+    readonly CONTENT_VIEW_TYPE = CONTENT_VIEW_TYPE;
+    readonly PAGE_VIEW_TYPE = PAGE_VIEW_TYPE;
+    readonly POPUP = POPUP;
+    readonly Array = Array;
 
     // INJECTS
     private router = inject(Router);
-    private collectionService: CollectionService = inject(CollectionService);
-    private usersService = inject(UsersService);
     private authService = inject(AuthService);
     private watchlistService = inject(WatchlistService);
-    private cdr = inject(ChangeDetectorRef);
+    private filterService = inject(FilterService);
+    protected watchlistMembersCountPipe = inject(WatchlistMembersCountPipe);
 
     // SIGNALS
-    filter = signal<CONTENT_TYPE>(CONTENT_TYPE.MOVIE);
-    view = signal<VIEW_TYPE>(VIEW_TYPE.NOT_SEEN);
-    fullCollection = signal<MergedMedia[]>([]);
-    // watchlist = signal<MergedMedia[]>([]);
+    readonly contentTypeFilter = this.filterService.contentType;
+    readonly contentViewTypeFilter = this.filterService.contentViewType;
 
-    selectedInfo = signal<EnrichedMedia | null>(null);
+    fullCollection = signal<MergedMedia[]>([]);
+    selectedInfo = signal<CardInfo | null>(null);
 
     showDetailsPopup = signal<boolean>(false);
+    showWatchlistsPopup = signal<boolean>(false);
     showNewWatchlistPopup = signal<boolean>(false);
-
+    showMembersPopup = signal<boolean>(false);
+    showAddMembersPopup = signal<boolean>(false);
     animatePopupDetails = signal<boolean>(true);
 
-    isWatchlistSelectorOpen = signal<boolean>(false);
-
-    loading = signal<boolean>(true);
-
-    noResults = signal<boolean>(false);
-
+    // ASYNC STATE
     user = toSignal(this.authService.user$);
-    watchlist = toSignal(this.watchlistService.activeWatchlist$);
-    filteredWatchlist = computed(() => {
-        const list = this.watchlist();
-
-        const filter = this.filter();
-        const view = this.view();
-        if (!list) return null;
-
-        const filteredMedias = list.medias.filter((media) => {
-            return media.mediaDetails.type === filter && media.isSeen === (view === VIEW_TYPE.SEEN);
-        });
-
-        return { ...list, medias: filteredMedias };
-    });
-
-    initialsLoggedUser = computed<string>(() => this.user()?.name[0].toUpperCase() ?? '');
-
-    activeWatchlistId = signal<string | null>(localStorage.getItem('activeWatchlistId'));
-
+    activeWatchlist = toSignal(this.watchlistService.activeWatchlist$);
     userWatchlists = toSignal(this.watchlistService.watchlists$);
 
-    // OPTIONS
-    contentTypeOptions: Array<ParamOptions> = [
-        { id: CONTENT_TYPE.MOVIE, value: 'Films' },
-        { id: CONTENT_TYPE.TV, value: 'Séries' },
-    ];
-    viewOptions: Array<ParamOptions> = [
-        { id: VIEW_TYPE.SEEN, value: 'A voir' },
-        { id: VIEW_TYPE.NOT_SEEN, value: 'Vus' },
-    ];
+    // COMPUTED
+    filteredWatchlist = computed(() => {
+        const watchlist = this.activeWatchlist();
+        const contentType = this.contentTypeFilter();
+        const contentViewType = this.contentViewTypeFilter();
+
+        if (!watchlist) return null;
+
+        const filteredMedias = watchlist.medias.filter((media) => {
+            return (
+                media.mediaDetails.type === contentType &&
+                media.isSeen === (contentViewType === CONTENT_VIEW_TYPE.SEEN)
+            );
+        });
+
+        return { ...watchlist, medias: filteredMedias };
+    });
+    activeMembers = computed(() =>
+        this.activeWatchlist()?.members?.filter((member) => member.invitationAccepted),
+    );
 
     // OTHER
     @ViewChild('watchlistWrapper') watchlistWrapper!: ElementRef<HTMLDivElement>;
     @ViewChild('dropdownMenu') dropdownMenu!: ElementRef<HTMLDivElement>;
 
-    async ngOnInit(): Promise<void> {
-        if (localStorage.getItem('filter')) {
-            this.filter.set(localStorage.getItem('filter') as CONTENT_TYPE);
-        }
-
-        if (localStorage.getItem('view-watchlist')) {
-            this.view.set(localStorage.getItem('view-watchlist') as VIEW_TYPE);
-        }
-
-        if (this.activeWatchlistId()) {
-            this.updateWatchlist();
-        }
-    }
-
+    // METHODS
     setContentType(contentType: CONTENT_TYPE) {
-        this.filter.set(contentType);
-        localStorage.setItem('filter', contentType);
-
-        this.cdr.detectChanges();
-
+        this.filterService.setContentType(contentType);
         setTimeout(() => {
             this.watchlistWrapper.nativeElement.scrollTop = 0;
         }, 0);
     }
 
-    updateWatchlist(): void {
-        this.collectionService.getWatchlistMedias(this.activeWatchlistId()!).subscribe((medias) => {
-            this.loading.set(false);
-            this.fullCollection.set(
-                medias.sort((a, b) => {
-                    const dateA = new Date(a.mediaWatchlistInfos!.dateAddedToWatchlist).getTime();
-                    const dateB = new Date(b.mediaWatchlistInfos!.dateAddedToWatchlist).getTime();
-                    return dateA - dateB;
-                }),
-            );
-        });
-    }
-
     openSearchView(): void {
-        this.router.navigate(['search']);
+        this.router.navigate(['/search'], { replaceUrl: true });
     }
 
-    setView(view: VIEW_TYPE): void {
-        this.view.set(view);
-        localStorage.setItem('view-watchlist', this.view());
+    setView(view: CONTENT_VIEW_TYPE): void {
+        this.filterService.setContentViewType(view);
     }
 
-    handleShowDetails(info: EnrichedMedia) {
-        this.selectedInfo.set(info);
-        this.showDetailsPopup.set(true);
+    openPopup(popup: POPUP, data?: EnrichedMedia) {
+        switch (popup) {
+            case POPUP.ITEM_DETAILS:
+                this.selectedInfo.set(data!);
+                this.showDetailsPopup.set(true);
+                return;
+            case POPUP.NEW_WATCHLIST:
+                this.showNewWatchlistPopup.set(true);
+                break;
+            case POPUP.WATCHLISTS:
+                this.showWatchlistsPopup.set(true);
+                break;
+            case POPUP.MEMBERS:
+                this.showMembersPopup.set(true);
+                break;
+            case POPUP.ADD_MEMBERS:
+                this.showAddMembersPopup.set(true);
+                break;
+            default:
+                return;
+        }
     }
 
-    closeDetailsPopup() {
-        this.showDetailsPopup.set(false);
-        this.animatePopupDetails.set(true);
+    closePopup(popup: POPUP) {
+        switch (popup) {
+            case POPUP.ITEM_DETAILS:
+                this.showDetailsPopup.set(false);
+                this.animatePopupDetails.set(true);
+                break;
+            case POPUP.NEW_WATCHLIST:
+                this.showNewWatchlistPopup.set(false);
+                break;
+            case POPUP.WATCHLISTS:
+                this.showWatchlistsPopup.set(false);
+                break;
+            case POPUP.MEMBERS:
+                this.showMembersPopup.set(false);
+                break;
+            case POPUP.ADD_MEMBERS:
+                this.showAddMembersPopup.set(false);
+                break;
+            default:
+                return;
+        }
     }
 
     handleUpdate() {
         this.animatePopupDetails.set(false);
     }
 
-    async logOut() {
-        await this.authService.logout();
-        this.router.navigateByUrl('/access', { replaceUrl: true });
+    openProfile(): void {
+        this.router.navigate(['/profile'], { replaceUrl: true });
     }
 
-    toggleWatchlistSelector(): void {
-        this.isWatchlistSelectorOpen.update((value) => !value);
-    }
+    // toggleWatchlistSelector(): void {
+    //     this.isWatchlistSelectorOpen.update((value) => !value);
+    // }
 
-    selectWatchlist(watchlistId: string): void {
-        this.watchlistService.setActiveId(watchlistId);
-        this.isWatchlistSelectorOpen.set(false);
-    }
+    // selectWatchlist(watchlistId: string): void {
+    //     this.watchlistService.setActiveId(watchlistId);
+    //     this.isWatchlistSelectorOpen.set(false);
+    // }
 
-    createNewWatchlist(): void {
-        this.showNewWatchlistPopup.set(true);
-        this.isWatchlistSelectorOpen.set(false);
-    }
+    // createNewWatchlist(): void {
+    //     this.showNewWatchlistPopup.set(true);
+    //     this.isWatchlistSelectorOpen.set(false);
+    // }
 
-    onNewWatchlistCreated(newWatchlist: WatchlistItem): void {
+    handleNewWatchlist(newWatchlist: WatchlistItem): void {
         this.showNewWatchlistPopup.set(false);
         this.watchlistService.setActiveId(newWatchlist.uidWatchlist);
-    }
-
-    @HostListener('document:click', ['$event'])
-    onDocumentClick(event: MouseEvent): void {
-        if (
-            this.isWatchlistSelectorOpen() &&
-            this.dropdownMenu &&
-            !this.dropdownMenu.nativeElement.contains(event.target as Node)
-        ) {
-            this.isWatchlistSelectorOpen.set(false);
-        }
     }
 }

@@ -1,12 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { Genre } from '../models/tmdb.models';
 
 @Pipe({
-  name: 'displayGenre'
+    name: 'displayGenre',
 })
 export class DisplayGenrePipe implements PipeTransform {
-
-  transform(genre: string): string {
-    return genre.split(' ')[0];
-  }
-
+    transform(genres: Genre[]): string {
+        return genres[0].name.split(' ')[0];
+    }
 }

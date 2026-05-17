@@ -1,0 +1,118 @@
+.profile {
+    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+}
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    --header-height: 2.75rem;
+    height: var(--header-height);
+    position: relative;
+
+    &::ng-deep .button {
+        padding: 0 !important;
+        width: var(--header-height);
+        font-size: 1rem !important;
+    }
+}
+
+.profile-infos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.profile-avatar {
+    height: 4rem;
+    width: 4rem;
+
+    &::ng-deep .avatar-pp {
+        font-size: 2rem;
+    }
+}
+
+.profile-name {
+    color: var(--primary-text-color);
+    font-size: 2rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.profile-username {
+    font-size: 1rem;
+    color: var(--secondary-text-color);
+}
+
+.profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.profile-tabs {
+    display: flex;
+    gap: 0.375rem;
+    align-items: center;
+}
+
+.profile-tab {
+    font-size: 1rem;
+    color: var(--secondary-text-color);
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.5rem 0.75rem;
+    transition: all 0.3s ease-in;
+    background-color: var(--default-btn-color);
+    border-radius: var(--full-radius);
+    border: 0.1rem solid var(--border-color);
+
+    &.active {
+        font-weight: 600;
+        color: var(--primary-text-color);
+        background-color: var(--secondary-text-color);
+
+        color: var(--bg-color);
+    }
+}
+
+.invitations {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.history-tags {
+    display: flex;
+    gap: 0.25rem;
+    .history-tag {
+        padding: 0.375rem 0.75rem;
+        border: 0.1rem solid var(--border-color);
+        border-radius: var(--full-radius);
+        color: var(--third-text-color);
+        font-size: 0.9rem;
+        transition: all 0.4s ease;
+
+        &.active {
+            border-color: var(--secondary-text-color);
+            color: var(--secondary-text-color);
+            font-weight: 600;
+        }
+    }
+}
+
+.history-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(12rem, 29vw), 1fr));
+    gap: 0.5rem;
+}

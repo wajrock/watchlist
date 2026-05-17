@@ -1,98 +1,123 @@
 import {
     ChangeDetectorRef,
     Component,
+    computed,
     ElementRef,
     inject,
-    Input,
     signal,
     ViewChild,
 } from '@angular/core';
+import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import axios from 'axios';
-import { debounceTime, Subject, Subscription } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
-import {
-    API_RESPONSE,
-    MergedMedia,
-    CONTENT_TYPE,
-    CollectionMedia,
-    EnrichedMedia,
-} from '../../../shared/models';
-import { CollectionService } from '../../../shared/services/collection.service';
-import { ItemPopupDetailsComponent } from '../../item-popup-details/item-popup-details.component';
+
+import { SearchbarComponent } from '../../../shared/components/searchbar/searchbar.component';
+import { ApiMedia, MergedMedia } from '../../../shared/models/firebase.models';
+import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
+import { FilterService } from '../../../shared/services/filter/filter.service';
+import { TmdbService } from '../../../shared/services/tmdb/tmdb.service';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
+import { mapDetailsToApiMedia, mapSearchToApiMedia } from '../../../shared/utils/media.utils';
+import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
 
 @Component({
     selector: 'app-search',
-    imports: [CardComponent, FormsModule, ItemPopupDetailsComponent, ButtonComponent],
+    imports: [
+        CardComponent,
+        FormsModule,
+        MediaPopupDetailsComponent,
+        ButtonComponent,
+        SearchbarComponent,
+    ],
     templateUrl: './search.component.html',
     styleUrl: './search.component.scss',
 })
 export class SearchComponent {
-    private router = inject(Router);
+    // CONSTANTS
+    readonly CONTENT_TYPE = CONTENT_TYPE;
+    readonly PAGE_VIEW_TYPE = PAGE_VIEW_TYPE;
+    readonly Array = Array;
 
-    @Input() contentType!: CONTENT_TYPE;
-    @ViewChild('searchInput') searchInput!: ElementRef;
-    @ViewChild('searchbar') searchbar!: ElementRef;
+    // INJECTS
+    private router = inject(Router);
+    private readonly cdr = inject(ChangeDetectorRef);
+    private watchlistsService = inject(WatchlistService);
+    private tmdbService = inject(TmdbService);
+    private filterService = inject(FilterService);
+
     @ViewChild('gridResults') gridResults!: ElementRef<HTMLDivElement>;
 
-    public value: string = '';
+    selectedInfo!: CardInfo;
 
-    public searchResults: EnrichedMedia[] = [];
+    // Signals
+    noResults = signal<boolean>(false);
+    showDetailsPopup = signal<boolean>(false);
+    animatePopupDetails = signal<boolean>(false);
 
-    public selectedInfo!: EnrichedMedia;
-
-    public noResults: boolean = false;
-    public isSearchActive: boolean = false;
-    public showDetailsPopup = false;
-    public animatePopupDetails = true;
-
-    public defaultFilter!: CONTENT_TYPE;
-
-    private searchSubject = new Subject<string>();
-    private searchSub!: Subscription;
-
-    private readonly cdr = inject(ChangeDetectorRef);
-
-    constructor(public collectionService: CollectionService) {}
-
-    activeWatchlistId = signal<string>(localStorage.getItem('activeWatchlistId')!);
+    activeWatchlist = toSignal(this.watchlistsService.activeWatchlist$);
     fullCollection = signal<MergedMedia[]>([]);
 
-    ngOnInit() {
-        if (localStorage.getItem('filter')) {
-            this.defaultFilter = localStorage.getItem('filter') as CONTENT_TYPE;
-            this.contentType = this.defaultFilter;
-        }
+    searchValue = signal<string>('');
+    contentTypeFilter = this.filterService.contentType;
 
-        this.collectionService.getWatchlistMedias(this.activeWatchlistId()).subscribe((medias) => {
-            this.fullCollection.set(medias);
-        });
+    // Async State
+    searchResults = toSignal(
+        combineLatest([toObservable(this.searchValue), toObservable(this.contentTypeFilter)]).pipe(
+            debounceTime(100),
+            distinctUntilChanged(),
+            switchMap(([value, type]) => {
+                if (value.length < 2) return of(null);
+                return this.tmdbService
+                    .search(type, value)
+                    .pipe(
+                        map((response) =>
+                            response.results.map((item) =>
+                                mapSearchToApiMedia(item, this.contentTypeFilter()),
+                            ),
+                        ),
+                    );
+            }),
+        ),
+        { initialValue: null },
+    );
 
-        this.searchSub = this.searchSubject.pipe(debounceTime(0)).subscribe(async (value) => {
-            await this.updateSearch();
+    // Computed
+    filteredSearchResults = computed<ApiMedia[]>(() => {
+        const searchResults = this.searchResults();
+        const watchlist = this.activeWatchlist();
+        if (!searchResults) return [];
+        return searchResults
+            ?.filter(
+                (item) => !watchlist?.medias.some((media) => media.mediaDetails.id === item.id),
+            )
+            ?.filter((item) => item.backdropPath)
+            .sort((a, b) => b.popularity - a.popularity)
+            .map((item) => {
+                return item;
+            });
+    });
 
-            this.noResults =
-                value.length > 0 && value.trim() !== '' && this.searchResults.length === 0;
-        });
-    }
-
-    ngOnDestroy() {
-        this.searchSub.unsubscribe();
-    }
+    // Resources
+    trendingsResource = rxResource({
+        request: this.contentTypeFilter,
+        loader: ({ request: contentType }) =>
+            this.tmdbService.getTrendings(contentType).pipe(
+                map((response) =>
+                    response.results.map((item) => {
+                        return mapDetailsToApiMedia(item, this.contentTypeFilter());
+                    }),
+                ),
+            ),
+    });
 
     async switchView() {
-        const newFilter =
-            this.contentType === CONTENT_TYPE.MOVIE ? CONTENT_TYPE.TV : CONTENT_TYPE.MOVIE;
-        this.contentType = newFilter;
-        //
-        localStorage.setItem('filter', newFilter);
-        await this.updateSearch();
-        this.noResults =
-            this.value.length > 0 && this.value.trim() !== '' && this.searchResults.length === 0;
+        const newType =
+            this.contentTypeFilter() === CONTENT_TYPE.MOVIE ? CONTENT_TYPE.TV : CONTENT_TYPE.MOVIE;
 
-        this.cdr.detectChanges();
+        this.filterService.setContentType(newType);
 
         setTimeout(() => {
             this.gridResults.nativeElement.scrollTop = 0;
@@ -100,88 +125,24 @@ export class SearchComponent {
     }
 
     closeSearchPage() {
-        localStorage.setItem('filter', this.contentType);
-        this.router.navigate(['']);
+        this.router.navigate([''], { replaceUrl: true });
     }
 
-    onSearchChange(value: string) {
-        this.searchSubject.next(value);
-    }
-
-    isInCollection(apiId: number): boolean {
-        return this.fullCollection().some((media) => media.apiId === apiId);
-    }
-
-    async updateSearch() {
-        if (!this.value?.trim()) {
-            this.searchResults = [];
-            return;
-        }
-
-        const headers = {
-            accept: 'application/json',
-            Authorization:
-                'Bearer ***REMOVED***',
-        };
-
-        const response = await axios.get(
-            `https://api.themoviedb.org/3/search/${this.contentType}?query=${this.value}&include_adult=false&language=fr-FR&page=1`,
-            { headers },
-        );
-        const moviesList = (response.data.results as API_RESPONSE[]).sort(
-            (a, b) => b.popularity - a.popularity,
-        );
-
-        if (this.contentType === 'movie') {
-            this.searchResults = moviesList
-                .filter((movie) => movie.backdrop_path && !this.isInCollection(movie.id))
-                .sort((a, b) => b.popularity - a.popularity)
-                .map(({ id, ...movie }) => ({
-                    apiId: id,
-                    mediaCollectionInfos: { apiId: id, ...movie, type: CONTENT_TYPE.MOVIE },
-                }));
-        } else {
-            this.searchResults = (response.data.results as API_RESPONSE[])
-                .filter((serie) => serie.backdrop_path && !this.isInCollection(serie.id))
-                .sort((a, b) => b.popularity - a.popularity)
-                .map(({ id, name, first_air_date, ...rest }) => ({
-                    addedByUserId: undefined,
-                    dateAddedToWatchlist: undefined,
-                    uidMedia: null,
-                    isSeen: null,
-                    mediaDetails: {
-                        apiId: id,
-                        ...rest,
-                        type: CONTENT_TYPE.TV,
-                        title: name,
-                        release_date: first_air_date,
-                    },
-                }));
-        }
-    }
-
-    clearSearch(): void {
-        this.value = '';
-        this.updateSearch();
-        this.noResults = false;
-    }
-
-    handleShowDetails(info: EnrichedMedia) {
+    handleShowDetails(info: CardInfo) {
         this.selectedInfo = info;
-        this.showDetailsPopup = true;
+        this.showDetailsPopup.set(true);
     }
 
     closeDetailsPopup() {
-        this.showDetailsPopup = false;
-        this.animatePopupDetails = true;
+        this.showDetailsPopup.set(false);
+        this.animatePopupDetails.set(true);
     }
 
     onMediaAddedToWatchlist(): void {
         this.closeDetailsPopup();
-        this.updateSearch();
     }
 
     handleUpdate() {
-        this.animatePopupDetails = false;
+        this.animatePopupDetails.set(false);
     }
 }

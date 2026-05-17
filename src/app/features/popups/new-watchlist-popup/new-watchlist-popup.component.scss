@@ -1,0 +1,64 @@
+.new-watchlist {
+    height: 50lvh;
+    width: 100%;
+    padding: 4rem 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    height: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.new-watchlist-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    height: 100%;
+    position: relative;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.new-watchlist-title {
+    color: var(--primary-text-color);
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+.new-watchlist-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.new-watchlist-members-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+
+    &::ng-deep .button {
+        padding: 0.375rem 0.75rem !important;
+    }
+}
+
+.new-watchlist-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+    width: 100%;
+}
+
+.new-watchlist-action {
+    width: 100%;
+    &::ng-deep .button {
+        font-size: 1rem !important;
+    }
+}

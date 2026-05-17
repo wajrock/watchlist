@@ -1,0 +1,29 @@
+@let mediaDetails = this.mediaDetails();
+<div class="media-tags">
+    <div class="media-tags-item">
+        @if (contentType() === CONTENT_TYPE.MOVIE && mediaDetails.runtime) {
+            <p>{{ mediaDetails.runtime | displayRuntime }}</p>
+        }
+        @if (contentType() === CONTENT_TYPE.TV && mediaDetails.numberSeason) {
+            <p>{{ mediaDetails.numberSeason | displaySeasonsNumber }}</p>
+        }
+    </div>
+
+    <span>·</span>
+
+    @if (mediaDetails.genres) {
+        <div class="media-tags-item">
+            <p>{{ mediaDetails.genres | displayGenre }}</p>
+        </div>
+    }
+
+    @if (mediaDetails.releaseDate.length > 0) {
+        <span>·</span>
+
+        <div class="media-tags-item">
+            <p>
+                {{ mediaDetails.releaseDate | displayDate }}
+            </p>
+        </div>
+    }
+</div>

@@ -6,6 +6,7 @@
     align-items: center;
     display: flex;
     justify-content: center;
+    position: relative;
 }
 
 .avatar-pp {
@@ -13,10 +14,27 @@
     align-items: center;
     justify-content: center;
     border-radius: var(--full-radius);
-    color: var(--secondary-text-color);
+    color: var(--bg-color);
     font-weight: 600;
     height: 90%;
     aspect-ratio: 1;
-    background-color: #401f36;
+    background-color: var(--secondary-text-color);
     font-size: 120%;
+}
+
+.invitations-badge {
+    position: absolute;
+    background-color: var(--primary-color);
+    color: var(--primary-text-color);
+    font-size: 0.875rem;
+    height: 1.25rem;
+    width: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--full-radius);
+    outline: 0.15rem solid var(--bg-color);
+    top: 0;
+    left: 75%;
+    transform: translate(-25%, -25%);
 }

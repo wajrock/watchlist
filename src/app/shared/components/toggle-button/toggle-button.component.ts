@@ -12,7 +12,7 @@ import {
     ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ParamOptions } from '../../models';
+import { ParamOptions } from '../../models/models';
 
 @Component({
     selector: 'app-toggle-button',

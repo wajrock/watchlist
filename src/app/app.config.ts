@@ -7,6 +7,8 @@ import { environment } from '../environments/environments';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { tmdbInterceptor } from './core/interceptors/tmdb/tmdb.interceptor';
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -18,5 +20,6 @@ export const appConfig: ApplicationConfig = {
         }),
         provideAuth(() => getAuth()),
         provideAnimationsAsync(),
+        provideHttpClient(withInterceptors([tmdbInterceptor])),
     ],
 };

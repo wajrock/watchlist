@@ -1,0 +1,6 @@
+<div class="trailer">
+    <app-button class="popup-close btn.bordered" (action)="close()"
+        ><i class="fa-solid fa-xmark"></i
+    ></app-button>
+    <iframe [src]="trailerKey() | safeUrl" frameborder="0" playsinline title="trailer"></iframe>
+</div>

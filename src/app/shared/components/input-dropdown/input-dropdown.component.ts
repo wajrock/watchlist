@@ -9,11 +9,12 @@ import {
     signal,
 } from '@angular/core';
 import { InputComponent } from '../input/input.component';
-import { ParamOptions } from '../../models';
+import { ParamOptions } from '../../models/models';
+import { SearchbarComponent } from '../searchbar/searchbar.component';
 
 @Component({
     selector: 'app-input-dropdown',
-    imports: [InputComponent],
+    imports: [SearchbarComponent],
     templateUrl: './input-dropdown.component.html',
     styleUrl: './input-dropdown.component.scss',
 })
@@ -36,16 +37,18 @@ export class InputDropdownComponent {
     onDropdownOpen = output<boolean>();
 
     filteredOptions = computed(() => {
-        return this.value() === ''
-            ? this.options()
-            : this.options().filter((option) =>
-                  option.value.toLowerCase().includes(this.value().toLowerCase()),
-              );
+        const filteredOptions =
+            this.value() === ''
+                ? this.options()
+                : this.options().filter((option) =>
+                      option.value.toLowerCase().includes(this.value().toLowerCase()),
+                  );
+
+        return filteredOptions.length > 2 ? filteredOptions.slice(2) : filteredOptions;
     });
 
-    onValueInput(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        this.value.set(input.value);
+    onValueInput(value: string): void {
+        this.value.set(value);
         const shouldOpen = this.value().length > 0 && this.filteredOptions().length > 0;
         this.isOptionsVisible.set(shouldOpen);
         this.onDropdownOpen.emit(shouldOpen);

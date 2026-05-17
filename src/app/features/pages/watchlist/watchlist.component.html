@@ -1,42 +1,21 @@
+@let activeWatchlist = this.activeWatchlist();
 @if (userWatchlists(); as lists) {
     <main class="watchlist page">
-        <div class="watchlist-overlay"></div>
+        <div class="overlay"></div>
 
         <header class="watchlist-header">
             @if (lists.length > 0) {
-                <div class="watchlists-dropdown">
-                    <app-button
-                        customClass="btn-default btn-bordered"
-                        (action)="toggleWatchlistSelector()"
-                    >
-                        Mes listes
-                    </app-button>
-                    @if (isWatchlistSelectorOpen()) {
-                        <div class="watchlists-dropdown-menu" #dropdownMenu @dropdownAnimation>
-                            @for (item of lists; track item.uidWatchlist) {
-                                <div
-                                    class="watchlists-dropdown-item"
-                                    [class.active]="item.uidWatchlist === watchlist()?.uidWatchlist"
-                                    (click)="selectWatchlist(item.uidWatchlist)"
-                                >
-                                    {{ item.name }}
-                                </div>
-                            }
-                            <div
-                                class="watchlists-dropdown-item new-watchlist"
-                                (click)="createNewWatchlist()"
-                            >
-                                <i class="fa-solid fa-plus"></i>
-                                Créer
-                            </div>
-                        </div>
-                    }
-                </div>
+                <app-button
+                    customClass="btn-default btn-bordered"
+                    (action)="openPopup(POPUP.WATCHLISTS)"
+                >
+                    <i class="fa-solid fa-bars-staggered"></i>
+                </app-button>
             }
             <app-avatar
-                [initials]="initialsLoggedUser()"
                 class="watchlist-avatar"
-                (click)="logOut()"
+                (click)="openProfile()"
+                [showBadge]="true"
             ></app-avatar>
         </header>
 
@@ -53,14 +32,17 @@
                     </app-button>
                 </div>
             </div>
-        } @else if (watchlist()) {
-            @let current = watchlist();
+        } @else if (activeWatchlist) {
             <div class="watchlist-infos">
-                <h1 class="watchlist-title">{{ current?.name }}</h1>
+                <h1 class="watchlist-title">{{ activeWatchlist.name }}</h1>
+                @let membersCount =
+                    this.watchlistMembersCountPipe.transform(activeWatchlist.members);
+                @if (membersCount) {
+                    <div class="watchlist-members" (click)="openPopup(POPUP.MEMBERS)">
+                        {{ membersCount }} Membre{{ membersCount > 1 ? 's' : '' }} >
+                    </div>
+                }
                 <div class="watchlist-actions">
-                    <!-- <app-button customClass="btn-default btn-rounded">
-                        <i class="fa-solid fa-shuffle"></i>
-                    </app-button> -->
                     <app-button
                         class="watchlist-search"
                         customClass="btn-cta"
@@ -69,10 +51,6 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                         Rechercher
                     </app-button>
-
-                    <app-button customClass="btn-default btn-rounded">
-                        <i class="fa-solid fa-plus"></i>
-                    </app-button>
                 </div>
             </div>
 
@@ -80,29 +58,29 @@
                 <div class="watchlist-filters">
                     <div
                         class="watchlist-filter"
-                        [class.active]="filter() === CONTENT_TYPE.MOVIE"
+                        [class.active]="contentTypeFilter() === CONTENT_TYPE.MOVIE"
                         (click)="setContentType(CONTENT_TYPE.MOVIE)"
                     >
                         Films
                     </div>
                     <div
                         class="watchlist-filter"
-                        [class.active]="filter() === CONTENT_TYPE.TV"
+                        [class.active]="contentTypeFilter() === CONTENT_TYPE.TV"
                         (click)="setContentType(CONTENT_TYPE.TV)"
                     >
                         Séries
                     </div>
                     <div
                         class="watchlist-filter"
-                        [class.active]="view() === VIEW_TYPE.NOT_SEEN"
-                        (click)="setView(VIEW_TYPE.NOT_SEEN)"
+                        [class.active]="contentViewTypeFilter() === CONTENT_VIEW_TYPE.NOT_SEEN"
+                        (click)="setView(CONTENT_VIEW_TYPE.NOT_SEEN)"
                     >
                         Pas vus
                     </div>
                     <div
                         class="watchlist-filter"
-                        [class.active]="view() === VIEW_TYPE.SEEN"
-                        (click)="setView(VIEW_TYPE.SEEN)"
+                        [class.active]="contentViewTypeFilter() === CONTENT_VIEW_TYPE.SEEN"
+                        (click)="setView(CONTENT_VIEW_TYPE.SEEN)"
                     >
                         Vus
                     </div>
@@ -113,28 +91,27 @@
                     @if (filteredList) {
                         @for (item of filteredList.medias; track item.uidMedia) {
                             <app-card
-                                class="watchlist-list-item"
-                                view="watchlist"
-                                [info]="item"
-                                [contentType]="filter()"
-                                (showDetails)="handleShowDetails(item)"
+                                [posterPath]="item.mediaDetails.posterPath"
+                                (openDetails)="openPopup(POPUP.ITEM_DETAILS, item)"
                             ></app-card>
                         } @empty {
                             <p class="watchlist-list-empty">
                                 {{
-                                    filter() === CONTENT_TYPE.MOVIE
+                                    contentTypeFilter() === CONTENT_TYPE.MOVIE
                                         ? 'Aucun films'
                                         : 'Aucune séries'
                                 }}
                             </p>
                         }
                     } @else {
-                        <div class="card-skeleton"></div>
-                        <div class="card-skeleton"></div>
-                        <div class="card-skeleton"></div>
-                        <div class="card-skeleton"></div>
-                        <div class="card-skeleton"></div>
-                        <div class="card-skeleton"></div>
+                        @for (_ of Array(15); track $index) {
+                            <div class="card-skeleton"></div>
+                            <div class="card-skeleton"></div>
+                            <div class="card-skeleton"></div>
+                            <div class="card-skeleton"></div>
+                            <div class="card-skeleton"></div>
+                            <div class="card-skeleton"></div>
+                        }
                     }
                 </div>
             </div>
@@ -143,16 +120,44 @@
 }
 
 @if (showDetailsPopup()) {
-    <app-item-popup-details
-        [view]="'watchlist'"
-        [contentType]="filter()"
-        [itemInfos]="selectedInfo()!"
-        [animateOnInit]="true"
-        (close)="closeDetailsPopup()"
-        (addedToCollection)="closeDetailsPopup()"
+    <app-media-popup-details
+        [view]="PAGE_VIEW_TYPE.WATCHLIST"
+        [contentType]="contentTypeFilter()"
+        [itemInfos]="selectedInfo()"
+        [animatePopup]="true"
+        (close)="closePopup(POPUP.ITEM_DETAILS)"
+        (addedToCollection)="closePopup(POPUP.ITEM_DETAILS)"
+        (removedFromCollection)="closePopup(POPUP.ITEM_DETAILS)"
         (updating)="handleUpdate()"
-    ></app-item-popup-details>
+    ></app-media-popup-details>
 }
+
+@if (showWatchlistsPopup()) {
+    <app-watchlists-popup
+        [watchlists]="userWatchlists()!"
+        (close)="closePopup(POPUP.WATCHLISTS)"
+        (createNewWatchlist)="openPopup(POPUP.NEW_WATCHLIST)"
+    ></app-watchlists-popup>
+}
+
 @if (showNewWatchlistPopup()) {
-    <app-new-watchlist-popup (close)="onNewWatchlistCreated($event)"></app-new-watchlist-popup>
+    <app-new-watchlist-popup
+        (close)="closePopup(POPUP.NEW_WATCHLIST)"
+        (onWatchlitCreated)="handleNewWatchlist($event)"
+    ></app-new-watchlist-popup>
+}
+
+@if (showMembersPopup() && activeWatchlist) {
+    <app-members-popup
+        [activeWatchlist]="activeWatchlist"
+        (close)="closePopup(POPUP.MEMBERS)"
+        (inviteFriends)="openPopup(POPUP.ADD_MEMBERS)"
+    ></app-members-popup>
+}
+
+@if (showAddMembersPopup() && activeWatchlist) {
+    <app-add-members-popup
+        [activeWatchlist]="activeWatchlist"
+        (close)="closePopup(POPUP.ADD_MEMBERS)"
+    ></app-add-members-popup>
 }

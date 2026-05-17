@@ -1,0 +1,35 @@
+<app-popup (close)="close.emit()">
+    <div class="watchlists">
+        <div class="overlay"></div>
+        <div class="watchlists-content">
+            <h1 class="watchlists-title">Mes Watchlists</h1>
+            <div class="watchlists-list">
+                @for (watchlist of watchlists(); track watchlist.uidWatchlist) {
+                    <div
+                        class="watchlist"
+                        [class.active]="watchlist.uidWatchlist === activeWatchlist()?.uidWatchlist"
+                    >
+                        <div
+                            class="watchlist-name"
+                            (click)="selectWatchlist(watchlist.uidWatchlist)"
+                        >
+                            {{ watchlist.name }}
+                        </div>
+                        <app-button
+                            class="watchlist-delete"
+                            customClass="btn-cta"
+                            (action)="removeWatchlist(watchlist.uidWatchlist)"
+                            ><i class="fa-solid fa-trash"></i
+                        ></app-button>
+                    </div>
+                }
+            </div>
+            <app-button
+                class="watchlists-add"
+                customClass="btn-primary"
+                (action)="createWatchlist()"
+                ><i class="fa-solid fa-add"></i>Créer une watchlist</app-button
+            >
+        </div>
+    </div>
+</app-popup>
