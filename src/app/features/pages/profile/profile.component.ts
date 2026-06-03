@@ -1,20 +1,19 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { Router } from '@angular/router';
-import { AuthService } from '../../../shared/services/auth/auth.service';
-import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
+import { documentId } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
 import { combineLatest, map, of, switchMap } from 'rxjs';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { CardComponent } from '../../../shared/components/card/card.component';
+import { ApiMedia, EnrichedMedia, GRADE, User } from '../../../shared/models/firebase.models';
+import { CONTENT_TYPE, PROFILE_SECTION_VIEW } from '../../../shared/models/models';
+import { TOAST_TYPE } from '../../../shared/models/toast.model';
+import { AuthService } from '../../../shared/services/auth/auth.service';
 import { CollectionService } from '../../../shared/services/collection/collection.service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
-import { TOAST_TYPE } from '../../../shared/models/toast.model';
-import { CONTENT_TYPE, PROFILE_SECTION_VIEW } from '../../../shared/models/models';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 import { InvitationComponent } from './invitation/invitation.component';
-import { CardComponent } from '../../../shared/components/card/card.component';
-import { mapDetailsToApiMedia } from '../../../shared/utils/media.utils';
-import { ApiMedia, GRADE, User } from '../../../shared/models/firebase.models';
-import { documentId } from '@angular/fire/firestore';
 
 @Component({
     selector: 'app-profile',
@@ -97,6 +96,23 @@ export class ProfileComponent {
     });
 
     historyFilter = signal<CONTENT_TYPE | GRADE>(CONTENT_TYPE.MOVIE);
+
+    filteredMedias = computed(() => {
+        const allMedias = this.medias();
+        const filter = this.historyFilter();
+
+        if (!allMedias) return [];
+
+        let filteredMedias: EnrichedMedia[];
+
+        if (filter === CONTENT_TYPE.MOVIE || filter === CONTENT_TYPE.TV) {
+            filteredMedias = allMedias?.filter((media) => media.mediaDetails.type === filter);
+        } else {
+            filteredMedias = allMedias?.filter((media) => media.grade === filter);
+        }
+
+        return filteredMedias;
+    });
 
     goBack(): void {
         this.router.navigate(['/'], { replaceUrl: true });

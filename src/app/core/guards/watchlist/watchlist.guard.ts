@@ -1,15 +1,12 @@
 import { inject } from '@angular/core';
-import { user } from '@angular/fire/auth';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
+import { filter, firstValueFrom, take } from 'rxjs';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, firstValueFrom, take } from 'rxjs';
 
 export const watchlistGuard: CanActivateFn = async () => {
     const watchlistService = inject(WatchlistService);
     const authService = inject(AuthService);
-    const router = inject(Router);
 
     const user = await firstValueFrom(
         authService.user$.pipe(

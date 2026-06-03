@@ -72,6 +72,7 @@
                             <div
                                 class="history-tag"
                                 [class.active]="historyFilter() === CONTENT_TYPE.MOVIE"
+                                (click)="historyFilter.set(CONTENT_TYPE.MOVIE)"
                             >
                                 Films
                             </div>
@@ -81,6 +82,8 @@
                             <div
                                 class="history-tag"
                                 [class.active]="historyFilter() === CONTENT_TYPE.TV"
+                                (click)="historyFilter.set(CONTENT_TYPE.MOVIE)"
+                                (click)="historyFilter.set(CONTENT_TYPE.TV)"
                             >
                                 Séries
                             </div>
@@ -89,18 +92,25 @@
                         @if (likeMediasCount && likeMediasCount > 0) {
                             <div
                                 class="history-tag"
-                                [class.active]="historyFilter() === GRADE.LOVE"
+                                [class.active]="historyFilter() === GRADE.LIKE"
+                                (click)="historyFilter.set(GRADE.LIKE)"
                             >
                                 J'aime
                             </div>
                         }
 
                         @if (loveMediasCount && loveMediasCount > 0) {
-                            <div class="history-tag">J'adore</div>
+                            <div
+                                class="history-tag"
+                                [class.active]="historyFilter() === GRADE.LOVE"
+                                (click)="historyFilter.set(GRADE.LOVE)"
+                            >
+                                J'adore
+                            </div>
                         }
                     </div>
                     <div class="history-grid">
-                        @for (media of medias; track media.uidMedia) {
+                        @for (media of filteredMedias(); track media.uidMedia) {
                             <app-card [posterPath]="media.mediaDetails.posterPath"></app-card>
                         }
                     </div>
