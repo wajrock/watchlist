@@ -1,4 +1,9 @@
 <router-outlet> </router-outlet>
+
+@if (showNavbar()) {
+    <app-navbar class="navbar"></app-navbar>
+}
+
 @if (currentToast(); as currentToast) {
     <app-toast class="toast" [toast]="currentToast"></app-toast>
 }

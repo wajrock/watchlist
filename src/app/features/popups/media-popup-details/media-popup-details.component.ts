@@ -55,7 +55,6 @@ export class MediaPopupDetailsComponent {
     itemInfos = input<CardInfo | null>(null);
     contentType = input.required<CONTENT_TYPE>();
     view = input.required<PAGE_VIEW_TYPE>();
-    animatePopup = input<boolean>(true);
 
     // OUTPUTS
     addedToCollection = output<void>();
@@ -72,7 +71,7 @@ export class MediaPopupDetailsComponent {
 
             const baseMedia = isEnriched(info) ? info.mediaDetails : info;
 
-            if (view === PAGE_VIEW_TYPE.SEARCH) {
+            if (view !== PAGE_VIEW_TYPE.WATCHLIST) {
                 return this.tmdbService.getFullContext(baseMedia.id, baseMedia.type);
             }
 
@@ -96,9 +95,9 @@ export class MediaPopupDetailsComponent {
         }
 
         const mediaWatchlistInfo = this.mediaWatchlistInfo();
-        const isSearchView = this.view() === PAGE_VIEW_TYPE.SEARCH;
+        const isWatchlistView = this.view() === PAGE_VIEW_TYPE.WATCHLIST;
 
-        if (isSearchView) return false;
+        if (!isWatchlistView) return false;
 
         return mediaWatchlistInfo ? mediaWatchlistInfo.isSeen : null;
     });
@@ -210,8 +209,6 @@ export class MediaPopupDetailsComponent {
     }
 
     changeActionsView(view: ACTIONS_VIEW) {
-        console.log(view);
-
         this.actionsView.set(view);
     }
 
@@ -222,7 +219,7 @@ export class MediaPopupDetailsComponent {
 
         const newStatus = !currentSeenStatus;
 
-        if (this.view() === PAGE_VIEW_TYPE.SEARCH) {
+        if (this.view() !== PAGE_VIEW_TYPE.WATCHLIST) {
             this.uiStatusChanged.set(newStatus);
             this.addToCollection();
         } else {

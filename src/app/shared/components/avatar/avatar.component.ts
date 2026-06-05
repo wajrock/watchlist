@@ -2,10 +2,11 @@ import { Component, computed, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth/auth.service';
 import { WatchlistService } from '../../services/watchlist/watchlist.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
     selector: 'app-avatar',
-    imports: [],
+    imports: [RouterLink],
     templateUrl: './avatar.component.html',
     styleUrl: './avatar.component.scss',
 })

@@ -20,6 +20,7 @@ export enum POPUP {
 export enum PAGE_VIEW_TYPE {
     WATCHLIST = 'watchlist',
     SEARCH = 'search',
+    TRENDINGS = 'trendings',
 }
 
 export enum PROFILE_SECTION_VIEW {

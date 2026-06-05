@@ -1,6 +1,17 @@
 <div class="card" (click)="handleOpenDetails()">
     <img
-        [src]="`https://image.tmdb.org/t/p/w342${posterPath()}`"
+        [src]="buildTmdbUrl('w185')"
+        [attr.srcset]="
+            buildTmdbUrl('w92') +
+            ' 92w, ' +
+            buildTmdbUrl('w185') +
+            ' 185w, ' +
+            buildTmdbUrl('w342') +
+            ' 342w'
+        "
+        sizes="(max-width: 480px) 112px, (max-width: 1024px) 150px, 185px"
+        width="112"
+        height="168"
         alt=""
         class="card-cover"
         draggable="false"

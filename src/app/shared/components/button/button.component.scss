@@ -7,13 +7,13 @@
     text-align: center;
     touch-action: manipulation;
     width: 100%;
-    height: 100%;
+    height: var(--height, 100%);
     font-size: 0.9rem;
     display: flex;
     justify-content: center;
     align-items: center;
     border: 0.1rem solid transparent;
-    transition: border 0.3s ease-in-out;
+    transition: background-color 0.3s ease-in-out color 0.3s ease-in-out;
     border-radius: var(--full-radius);
     white-space: nowrap;
 }
@@ -56,6 +56,13 @@
 
 .btn-square {
     border-radius: var(--light-radius);
+}
+
+.btn-round {
+    padding: 0;
+    width: var(--height);
+    height: var(--height);
+    font-size: 1rem;
 }
 
 @media only screen and (min-width: 768px) {

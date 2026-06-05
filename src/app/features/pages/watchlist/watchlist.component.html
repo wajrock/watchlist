@@ -3,20 +3,17 @@
     <main class="watchlist page">
         <div class="overlay"></div>
 
-        <header class="watchlist-header">
+        <header class="page-header">
             @if (lists.length > 0) {
                 <app-button
-                    customClass="btn-default btn-bordered"
+                    class="watchlists-btn"
+                    customClass="btn-default btn-bordered btn-round"
                     (action)="openPopup(POPUP.WATCHLISTS)"
                 >
                     <i class="fa-solid fa-bars-staggered"></i>
                 </app-button>
             }
-            <app-avatar
-                class="watchlist-avatar"
-                (click)="openProfile()"
-                [showBadge]="true"
-            ></app-avatar>
+            <app-avatar class="user-avatar"></app-avatar>
         </header>
 
         @if (lists?.length === 0) {
@@ -37,48 +34,49 @@
                 <h1 class="watchlist-title">{{ activeWatchlist.name }}</h1>
                 @let membersCount =
                     this.watchlistMembersCountPipe.transform(activeWatchlist.members);
+
                 @if (membersCount) {
-                    <div class="watchlist-members" (click)="openPopup(POPUP.MEMBERS)">
-                        {{ membersCount }} Membre{{ membersCount > 1 ? 's' : '' }} >
+                    <div class="watchlist-members">
+                        <app-button class="members-count" customClass="btn-default btn-bordered">
+                            <i class="fa-solid fa-users"></i>
+                            {{ membersCount }} Membre{{ membersCount > 1 ? 's' : '' }}
+                        </app-button>
+                        <app-button
+                            class="members-add"
+                            customClass="btn-primary btn-bordered btn-round"
+                            (action)="openPopup(POPUP.MEMBERS)"
+                        >
+                            <i class="fa-solid fa-plus"></i>
+                        </app-button>
                     </div>
                 }
-                <div class="watchlist-actions">
-                    <app-button
-                        class="watchlist-search"
-                        customClass="btn-cta"
-                        (action)="openSearchView()"
-                    >
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        Rechercher
-                    </app-button>
-                </div>
             </div>
 
             <div class="watchlist-content">
-                <div class="watchlist-filters">
+                <div class="content-type-filters">
                     <div
-                        class="watchlist-filter"
+                        class="content-type-filter"
                         [class.active]="contentTypeFilter() === CONTENT_TYPE.MOVIE"
                         (click)="setContentType(CONTENT_TYPE.MOVIE)"
                     >
                         Films
                     </div>
                     <div
-                        class="watchlist-filter"
+                        class="content-type-filter"
                         [class.active]="contentTypeFilter() === CONTENT_TYPE.TV"
                         (click)="setContentType(CONTENT_TYPE.TV)"
                     >
                         Séries
                     </div>
                     <div
-                        class="watchlist-filter"
+                        class="content-type-filter"
                         [class.active]="contentViewTypeFilter() === CONTENT_VIEW_TYPE.NOT_SEEN"
                         (click)="setView(CONTENT_VIEW_TYPE.NOT_SEEN)"
                     >
                         Pas vus
                     </div>
                     <div
-                        class="watchlist-filter"
+                        class="content-type-filter"
                         [class.active]="contentViewTypeFilter() === CONTENT_VIEW_TYPE.SEEN"
                         (click)="setView(CONTENT_VIEW_TYPE.SEEN)"
                     >
@@ -124,11 +122,9 @@
         [view]="PAGE_VIEW_TYPE.WATCHLIST"
         [contentType]="contentTypeFilter()"
         [itemInfos]="selectedInfo()"
-        [animatePopup]="true"
         (close)="closePopup(POPUP.ITEM_DETAILS)"
         (addedToCollection)="closePopup(POPUP.ITEM_DETAILS)"
         (removedFromCollection)="closePopup(POPUP.ITEM_DETAILS)"
-        (updating)="handleUpdate()"
     ></app-media-popup-details>
 }
 

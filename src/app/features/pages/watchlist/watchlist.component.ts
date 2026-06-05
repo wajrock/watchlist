@@ -25,6 +25,7 @@ import { WatchlistsPopupComponent } from '../../popups/watchlists-popup/watchlis
 import { WatchlistMembersPopupComponent } from '../../popups/watchlist-members-popup/watchlist-members-popup.component';
 import { MembersPopupComponent } from '../../popups/members-popup/members-popup.component';
 import { AddMembersPopupComponent } from '../../popups/add-members-popup/add-members-popup.component';
+import { PopupService } from '../../../shared/services/popup/popup.service';
 
 @Component({
     selector: 'app-watchlist',
@@ -73,6 +74,7 @@ export class WatchlistComponent {
     private authService = inject(AuthService);
     private watchlistService = inject(WatchlistService);
     private filterService = inject(FilterService);
+    private popupService = inject(PopupService);
     protected watchlistMembersCountPipe = inject(WatchlistMembersCountPipe);
 
     // SIGNALS
@@ -87,7 +89,6 @@ export class WatchlistComponent {
     showNewWatchlistPopup = signal<boolean>(false);
     showMembersPopup = signal<boolean>(false);
     showAddMembersPopup = signal<boolean>(false);
-    animatePopupDetails = signal<boolean>(true);
 
     // ASYNC STATE
     user = toSignal(this.authService.user$);
@@ -154,6 +155,7 @@ export class WatchlistComponent {
                 this.showAddMembersPopup.set(true);
                 break;
             default:
+                this.popupService.close();
                 return;
         }
     }
@@ -162,7 +164,6 @@ export class WatchlistComponent {
         switch (popup) {
             case POPUP.ITEM_DETAILS:
                 this.showDetailsPopup.set(false);
-                this.animatePopupDetails.set(true);
                 break;
             case POPUP.NEW_WATCHLIST:
                 this.showNewWatchlistPopup.set(false);
@@ -175,33 +176,18 @@ export class WatchlistComponent {
                 break;
             case POPUP.ADD_MEMBERS:
                 this.showAddMembersPopup.set(false);
+                this.showMembersPopup.set(true);
                 break;
             default:
                 return;
         }
-    }
 
-    handleUpdate() {
-        this.animatePopupDetails.set(false);
+        this.popupService.close();
     }
 
     openProfile(): void {
         this.router.navigate(['/profile'], { replaceUrl: true });
     }
-
-    // toggleWatchlistSelector(): void {
-    //     this.isWatchlistSelectorOpen.update((value) => !value);
-    // }
-
-    // selectWatchlist(watchlistId: string): void {
-    //     this.watchlistService.setActiveId(watchlistId);
-    //     this.isWatchlistSelectorOpen.set(false);
-    // }
-
-    // createNewWatchlist(): void {
-    //     this.showNewWatchlistPopup.set(true);
-    //     this.isWatchlistSelectorOpen.set(false);
-    // }
 
     handleNewWatchlist(newWatchlist: WatchlistItem): void {
         this.showNewWatchlistPopup.set(false);

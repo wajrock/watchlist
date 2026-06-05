@@ -1,0 +1,49 @@
+<main class="page trendings">
+    <div class="overlay"></div>
+    <header class="page-header">
+        <h1 class="page-title">Tendances</h1>
+        <app-avatar class="user-avatar"></app-avatar>
+    </header>
+    <section class="content-type-filters">
+        <div
+            class="content-type-filter"
+            [class.active]="filterService.contentType() === CONTENT_TYPE.MOVIE"
+            (click)="filterService.setContentType(CONTENT_TYPE.MOVIE)"
+        >
+            Films
+        </div>
+        <div
+            class="content-type-filter"
+            [class.active]="filterService.contentType() === CONTENT_TYPE.TV"
+            (click)="filterService.setContentType(CONTENT_TYPE.TV)"
+        >
+            Séries
+        </div>
+    </section>
+    <section class="trendings-grid">
+        @if (trendingsResource.isLoading()) {
+            @for (_ of Array(15); track $index) {
+                <div class="card-skeleton"></div>
+            }
+        } @else {
+            @for (item of trendingsResource.value(); track item.id) {
+                @if (item.posterPath) {
+                    <app-card
+                        [posterPath]="item.posterPath"
+                        (openDetails)="handleShowDetails(item)"
+                    ></app-card>
+                }
+            }
+        }
+    </section>
+</main>
+
+@if (showDetailsPopup()) {
+    <app-media-popup-details
+        [view]="PAGE_VIEW_TYPE.TRENDINGS"
+        [contentType]="filterService.contentType()"
+        [itemInfos]="selectedInfo()"
+        (close)="closeDetailsPopup()"
+        (addedToCollection)="closeDetailsPopup()"
+    ></app-media-popup-details>
+}

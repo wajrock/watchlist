@@ -28,7 +28,6 @@ export const watchlistGuard: CanActivateFn = async () => {
     const isStillMember = lists.find((l) => l.uidWatchlist === currentId);
 
     if (!currentId || !isStillMember) {
-        console.log('correct');
         watchlistService.setActiveId(lists[0].uidWatchlist);
     }
 

@@ -13,8 +13,10 @@ export class CardComponent {
     // OUTPUTS
     openDetails = output<void>();
 
-    // SIGNALS
-    animatePopup = signal<boolean>(true);
+    buildTmdbUrl(size: 'w92' | 'w185' | 'w342'): string {
+        const path = this.posterPath();
+        return `https://image.tmdb.org/t/p/${size}${path}`;
+    }
 
     handleOpenDetails() {
         this.openDetails.emit();

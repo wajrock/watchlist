@@ -9,12 +9,15 @@ import { initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { tmdbInterceptor } from './core/interceptors/tmdb/tmdb.interceptor';
+import { provideFunctions } from '@angular/fire/functions';
+import { getFunctions } from 'firebase/functions';
 
 export const appConfig: ApplicationConfig = {
     providers: [
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes),
         provideFirebaseApp(() => initializeApp(environment.firebase)),
+        provideFunctions(() => getFunctions()),
         provideFirestore(() => {
             return initializeFirestore(getApp(), { localCache: persistentLocalCache() });
         }),

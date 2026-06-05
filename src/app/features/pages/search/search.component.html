@@ -1,27 +1,62 @@
 <main class="page search-wrapper">
     <div class="overlay"></div>
+    <header class="page-header">
+        <h1 class="page-title">Rechercher</h1>
+        <app-button
+            class="magic-search"
+            [customClass]="`${isMagicSearchActivated() ? 'btn-cta' : 'btn-default'} btn-bordered btn-round`"
+            (action)="switchSearchType()"
+        >
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </app-button>
+        <app-avatar class="user-avatar"></app-avatar>
+    </header>
+
     <div class="search-header">
-        <app-button customClass="btn-default btn-bordered" (action)="closeSearchPage()"
-            ><i class="fa-solid fa-arrow-left"></i
-        ></app-button>
         <app-searchbar
             class="searchbar-component"
-            placeholder="On regarde quoi"
+            [placeholder]="
+                isMagicSearchActivated()
+                    ? 'Décrivez ce que vous voulez voir'
+                    : 'Rechercher par titre..'
+            "
             inputName="medias-search"
             inputId="medias-search"
             [searchValue]="searchValue()"
             (onSearchChanged)="this.searchValue.set($event)"
         ></app-searchbar>
-        <app-button customClass="btn-default btn-bordered" (action)="switchView()">
-            @if (contentTypeFilter() === CONTENT_TYPE.MOVIE) {
-                <i class="fa-solid fa-film"></i>
-            } @else {
-                <i class="fa-solid fa-laptop"></i>
-            }
-        </app-button>
+        @if (isMagicSearchActivated()) {
+            <app-button
+                class="submit-search-btn"
+                customClass="btn-default btn-bordered btn-round"
+                (action)="onSearchSubmit()"
+            >
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </app-button>
+        }
     </div>
+
+    @if (!isMagicSearchActivated()) {
+        <section class="content-type-filters">
+            <div
+                class="content-type-filter"
+                [class.active]="filterService.contentType() === CONTENT_TYPE.MOVIE"
+                (click)="filterService.setContentType(CONTENT_TYPE.MOVIE)"
+            >
+                Films
+            </div>
+            <div
+                class="content-type-filter"
+                [class.active]="filterService.contentType() === CONTENT_TYPE.TV"
+                (click)="filterService.setContentType(CONTENT_TYPE.TV)"
+            >
+                Séries
+            </div>
+        </section>
+    }
+
     @if (searchValue().length > 1) {
-        <div class="results-grid" #gridResults>
+        <div class="results-grid">
             @for (item of filteredSearchResults(); track item.id) {
                 @if (item.posterPath) {
                     <app-card
@@ -36,28 +71,6 @@
                 }
             }
         </div>
-    } @else {
-        <div class="trendings">
-            <div class="trendings-header">
-                {{ contentTypeFilter() === CONTENT_TYPE.MOVIE ? 'Films' : 'Séries' }} Populaires
-            </div>
-            <div class="trendings-grid">
-                @if (trendingsResource.isLoading()) {
-                    @for (_ of Array(15); track $index) {
-                        <div class="card-skeleton"></div>
-                    }
-                } @else {
-                    @for (item of trendingsResource.value(); track item.id) {
-                        @if (item.posterPath) {
-                            <app-card
-                                [posterPath]="item.posterPath"
-                                (openDetails)="handleShowDetails(item)"
-                            ></app-card>
-                        }
-                    }
-                }
-            </div>
-        </div>
     }
 </main>
 
@@ -65,10 +78,8 @@
     <app-media-popup-details
         [view]="PAGE_VIEW_TYPE.SEARCH"
         [contentType]="contentTypeFilter()"
-        [itemInfos]="selectedInfo"
-        [animatePopup]="animatePopupDetails()"
+        [itemInfos]="selectedInfo()"
         (close)="closeDetailsPopup()"
         (addedToCollection)="onMediaAddedToWatchlist()"
-        (updating)="handleUpdate()"
     ></app-media-popup-details>
 }

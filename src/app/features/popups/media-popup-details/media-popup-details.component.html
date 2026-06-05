@@ -1,7 +1,7 @@
 @let mediaDetails = this.mediaDetails();
 @let mediaSeenStatus = this.mediaSeenStatus();
 @let mediaGrade = this.mediaGrade();
-<app-popup (close)="onClose()" [animateOnInit]="true">
+<app-popup (close)="onClose()" [animateOnInit]="true" [displayCloseBtn]="true">
     <div class="media-details-popup">
         @if (mediaDetails && mediaSeenStatus !== null && mediaGrade !== null) {
             <div class="backdrop-cover">

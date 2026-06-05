@@ -5,12 +5,15 @@ import {
     EventEmitter,
     HostListener,
     inject,
+    input,
     Input,
+    OnInit,
     Output,
     Renderer2,
     ViewChild,
 } from '@angular/core';
 import { ButtonComponent } from '../button/button.component';
+import { PopupService } from '../../services/popup/popup.service';
 
 @Component({
     selector: 'app-popup',
@@ -18,20 +21,26 @@ import { ButtonComponent } from '../button/button.component';
     templateUrl: './popup.component.html',
     styleUrl: './popup.component.scss',
 })
-export class PopupComponent {
+export class PopupComponent implements OnInit {
     private startY = 0;
     private currentY = 0;
     private threshold = 150;
     private isDragging = false;
     private renderer = inject(Renderer2);
+    private popupService = inject(PopupService);
 
-    @Input() animateOnInit = true;
+    animateOnInit = input<boolean>(true);
+    displayCloseBtn = input<boolean>(false);
 
     @Output() close = new EventEmitter<void>();
 
     @ViewChild('popup') popupContent!: ElementRef;
 
+    ngOnInit(): void {
+        this.popupService.isPopupOpen.set(true);
+    }
     closePopup(): void {
+        this.popupService.isPopupOpen.set(false);
         this.close.emit();
     }
 

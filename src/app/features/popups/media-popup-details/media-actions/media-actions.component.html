@@ -2,7 +2,7 @@
 @let mediaSeenStatus = this.mediaSeenStatus();
 @let mediaGrade = this.mediaGrade();
 <div class="media-actions">
-    @if (view() === PAGE_VIEW_TYPE.SEARCH) {
+    @if (view() !== PAGE_VIEW_TYPE.WATCHLIST) {
         @if (mediaDetails.trailer) {
             <app-button customClass="btn-default btn-bordered" (action)="openTrailer.emit()">
                 <i class="fa-solid fa-play"></i

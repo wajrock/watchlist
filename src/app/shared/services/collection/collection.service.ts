@@ -60,38 +60,6 @@ export class CollectionService {
         );
     }
 
-    // async migrateMediasCollection() {
-    //     const mediasRef = collection(this.firestore, 'medias');
-    //     const snapshot = await getDocs(mediasRef);
-    //     const batch = writeBatch(this.firestore);
-
-    //     let count = 0;
-
-    //     snapshot.docs.forEach((doc) => {
-    //         const data = doc.data();
-
-    //         // On vérifie si l'ancien champ 'id' existe encore
-    //         if (data['id'] !== undefined) {
-    //             const docRef = doc.ref;
-
-    //             batch.update(docRef, {
-    //                 // On s'assure que apiId prend la valeur de l'ancien id
-    //                 apiId: data['id'],
-    //                 // On supprime physiquement le champ 'id'
-    //                 id: deleteField(),
-    //             });
-    //             count++;
-    //         }
-    //     });
-
-    //     if (count > 0) {
-    //         await batch.commit();
-    //         console.log(`${count} documents mis à jour avec succès.`);
-    //     } else {
-    //         console.log('Aucun document à migrer.');
-    //     }
-    // }
-
     checkIfMediaAlreadyInDB(apiId: number, mediaType: string): Observable<string | null> {
         const filmsRef = collection(this.firestore, 'medias');
 

@@ -9,6 +9,7 @@
     color: var(--secondary-text-color);
     font-size: 1.5rem;
     line-height: 1;
+    position: relative;
 }
 
 .btn-back::ng-deep .button {
@@ -21,6 +22,7 @@
     flex-direction: column;
     gap: 0.5rem;
     width: 100%;
+    position: relative;
 }
 
 .form-error {
@@ -32,4 +34,8 @@
 
 .access-action::ng-deep .button {
     font-size: 1rem !important;
+}
+
+.access-action {
+    position: relative;
 }

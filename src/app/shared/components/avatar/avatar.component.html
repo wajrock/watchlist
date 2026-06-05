@@ -1,4 +1,4 @@
-<div class="avatar">
+<div class="avatar" routerLink="/profile" replaceUrl="true">
     <div class="avatar-pp">{{ initialsLoggedUser() }}</div>
     @let watchlistInvitations = this.watchlistInvitations();
     @if (showBadge() && watchlistInvitations && watchlistInvitations.length > 0) {

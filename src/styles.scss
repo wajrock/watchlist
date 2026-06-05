@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
-@import url("https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
 
 :root {
     --primary-color: #e11d48;
@@ -23,7 +23,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: "Gabarito", sans-serif;
+    font-family: 'Gabarito', sans-serif;
     -webkit-appearance: none;
     appearance: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -63,11 +63,52 @@ body {
     width: 90%;
     height: 70%;
     border-radius: 7.78125rem;
-    // background: rgba(238, 21, 32, 0.25);
     background: rgba(238, 21, 21, 0.25);
     filter: blur(100px);
     pointer-events: none;
     will-change: transform, filter;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.375rem;
+    position: relative;
+    --height: 2.625rem;
+}
+
+.user-avatar {
+    height: 2.625rem;
+    margin-left: auto;
+}
+
+.page-title {
+    font-family: 'Syne';
+    font-weight: 700;
+    color: var(--primary-text-color);
+    font-size: 1.875rem;
+}
+
+.content-type-filters {
+    display: flex;
+    gap: 0.25rem;
+    position: relative;
+
+    .content-type-filter {
+        padding: 0.375rem 0.75rem;
+        border: 0.1rem solid var(--border-color);
+        border-radius: var(--full-radius);
+        color: var(--third-text-color);
+        font-size: 0.9rem;
+        transition: all 0.4s ease;
+
+        &.active {
+            border-color: var(--secondary-text-color);
+            color: var(--secondary-text-color);
+            font-weight: 600;
+            opacity: 0.875;
+        }
+    }
 }
 
 .card-skeleton {
