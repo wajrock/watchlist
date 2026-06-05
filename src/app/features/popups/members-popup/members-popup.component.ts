@@ -1,10 +1,10 @@
 import { Component, inject, input, output } from '@angular/core';
-import { PopupComponent } from '../../../shared/components/popup/popup.component';
-import { EnrichedMember, EnrichedWatchlist, Member } from '../../../shared/models/firebase.models';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
-import { ToastService } from '../../../shared/services/toast/toast.service';
+import { PopupComponent } from '../../../shared/components/popup/popup.component';
+import { EnrichedWatchlist } from '../../../shared/models/firebase.models';
 import { TOAST_TYPE } from '../../../shared/models/toast.model';
+import { ToastService } from '../../../shared/services/toast/toast.service';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 
 @Component({
     selector: 'app-members-popup',

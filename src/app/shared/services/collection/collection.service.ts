@@ -1,32 +1,25 @@
-import { EnvironmentInjector, inject, Injectable, runInInjectionContext } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
-    Firestore,
-    collection,
     addDoc,
+    arrayUnion,
+    collection,
     collectionData,
-    deleteDoc,
     doc,
-    updateDoc,
+    Firestore,
+    getDoc,
     getDocs,
     query,
+    updateDoc,
     where,
-    getDoc,
-    writeBatch,
-    docData,
-    deleteField,
-    arrayUnion,
 } from '@angular/fire/firestore';
-import { catchError, combineLatest, from, map, Observable, of, switchMap } from 'rxjs';
-import * as bcrypt from 'bcryptjs';
+import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
 import {
-    WatchlistItem,
-    Member,
     ApiMedia,
+    GRADE,
+    Member,
+    WatchlistItem,
     WatchlistMediaAdd,
     WatchlistMediaCollection,
-    MergedMedia,
-    CollectionMedia,
-    GRADE,
 } from '../../models/firebase.models';
 
 @Injectable({

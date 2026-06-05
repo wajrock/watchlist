@@ -1,11 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'displayRate'
+    name: 'displayRate',
 })
 export class DisplayRatePipe implements PipeTransform {
-
-  transform(rate: number): string {
-    return (rate/2).toFixed(1);
-  }
+    transform(rate: number): string {
+        return (rate / 2).toFixed(1);
+    }
 }

@@ -3,21 +3,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TrailerComponent } from './trailer.component';
 
 describe('TrailerComponent', () => {
-  let component: TrailerComponent;
-  let fixture: ComponentFixture<TrailerComponent>;
+    let component: TrailerComponent;
+    let fixture: ComponentFixture<TrailerComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TrailerComponent]
-    })
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [TrailerComponent],
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(TrailerComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(TrailerComponent);
+        component = fixture.componentInstance;
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 });

@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
 import { addDoc, collection, collectionData, Firestore } from '@angular/fire/firestore';
-import * as bcrypt from 'bcryptjs';
 import { from, map, Observable } from 'rxjs';
 import { User } from '../../models/firebase.models';
 
@@ -32,8 +31,7 @@ export class UsersService {
 
     addUser(username: string, name: string, password: string): Observable<User> {
         const usersRef = collection(this.firestore, 'users');
-        const hashedPassword = bcrypt.hashSync(password, 10);
-        const newUser = { name, username, password: hashedPassword };
+        const newUser = { name, username };
         return from(addDoc(usersRef, newUser)).pipe(
             map((docRef) => ({
                 uid: docRef.id,

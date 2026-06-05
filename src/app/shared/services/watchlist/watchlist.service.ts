@@ -1,11 +1,5 @@
-import {
-    EnvironmentInjector,
-    inject,
-    Injectable,
-    runInInjectionContext,
-    signal,
-} from '@angular/core';
-import { AuthService } from '../auth/auth.service';
+import { inject, Injectable, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
     collection,
     collectionData,
@@ -19,25 +13,25 @@ import {
     updateDoc,
     where,
 } from '@angular/fire/firestore';
-import { toObservable } from '@angular/core/rxjs-interop';
 import {
-    switchMap,
+    catchError,
+    combineLatest,
+    from,
+    map,
+    Observable,
     of,
     shareReplay,
-    Observable,
-    combineLatest,
-    map,
-    catchError,
-    from,
+    switchMap,
     take,
 } from 'rxjs';
 import {
-    WatchlistItem,
     ApiMedia,
     EnrichedWatchlist,
-    User,
     Member,
+    User,
+    WatchlistItem,
 } from '../../models/firebase.models';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
     providedIn: 'root',
@@ -45,7 +39,6 @@ import {
 export class WatchlistService {
     private firestore = inject(Firestore);
     private authService = inject(AuthService);
-    private injector = inject(EnvironmentInjector);
 
     private _activeId = signal<string | null>(localStorage.getItem('activeWatchlistId'));
     readonly activeId = this._activeId.asReadonly();

@@ -1,29 +1,36 @@
 @let mediaDetails = this.mediaDetails();
+@let hasTime =
+    (contentType() === CONTENT_TYPE.MOVIE && mediaDetails.runtime) ||
+    (contentType() === CONTENT_TYPE.TV && mediaDetails.numberSeason);
+@let hasGenres = mediaDetails.genres && mediaDetails.genres.length > 0;
+@let hasDate = mediaDetails.releaseDate.length > 0;
 <div class="media-tags">
-    <div class="media-tags-item">
-        @if (contentType() === CONTENT_TYPE.MOVIE && mediaDetails.runtime) {
-            <p>{{ mediaDetails.runtime | displayRuntime }}</p>
-        }
-        @if (contentType() === CONTENT_TYPE.TV && mediaDetails.numberSeason) {
-            <p>{{ mediaDetails.numberSeason | displaySeasonsNumber }}</p>
-        }
-    </div>
-
-    <span>·</span>
-
-    @if (mediaDetails.genres) {
+    @if (hasTime) {
         <div class="media-tags-item">
-            <p>{{ mediaDetails.genres | displayGenre }}</p>
+            @if (contentType() === CONTENT_TYPE.MOVIE && mediaDetails.runtime) {
+                <p>{{ mediaDetails.runtime | displayRuntime }}</p>
+            }
+            @if (contentType() === CONTENT_TYPE.TV && mediaDetails.numberSeason) {
+                <p>{{ mediaDetails.numberSeason | displaySeasonsNumber }}</p>
+            }
         </div>
+        @if (hasGenres || hasDate) {
+            <span>·</span>
+        }
     }
 
-    @if (mediaDetails.releaseDate.length > 0) {
-        <span>·</span>
-
+    @if (hasGenres) {
         <div class="media-tags-item">
-            <p>
-                {{ mediaDetails.releaseDate | displayDate }}
-            </p>
+            <p>{{ mediaDetails.genres ?? [] | displayGenre }}</p>
+        </div>
+        @if (hasDate) {
+            <span>·</span>
+        }
+    }
+
+    @if (hasDate) {
+        <div class="media-tags-item">
+            <p>{{ mediaDetails.releaseDate | displayDate }}</p>
         </div>
     }
 </div>

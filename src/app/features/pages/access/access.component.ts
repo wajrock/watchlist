@@ -1,8 +1,6 @@
-import { Component, computed, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { UsersService } from '../../../shared/services/users/users.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 

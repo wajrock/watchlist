@@ -8,7 +8,6 @@ import {
     output,
     signal,
 } from '@angular/core';
-import { InputComponent } from '../input/input.component';
 import { ParamOptions } from '../../models/models';
 import { SearchbarComponent } from '../searchbar/searchbar.component';
 

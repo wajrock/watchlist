@@ -6,14 +6,13 @@ import {
     HostListener,
     inject,
     input,
-    Input,
     OnInit,
     Output,
     Renderer2,
     ViewChild,
 } from '@angular/core';
-import { ButtonComponent } from '../button/button.component';
 import { PopupService } from '../../services/popup/popup.service';
+import { ButtonComponent } from '../button/button.component';
 
 @Component({
     selector: 'app-popup',
