@@ -38,7 +38,7 @@ jobs:
                       measurementId: "${{ secrets.FIREBASE_MEASUREMENT_ID }}"
                     }
                   };
-                  export const TMD_API_KEY = "${{ secrets.TMDB_API_KEY }}";
+                  export const TMDB_API_KEY = "${{ secrets.TMDB_API_KEY }}";
                   EOF
 
             - name: Build project

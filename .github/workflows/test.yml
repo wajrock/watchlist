@@ -22,6 +22,25 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
+            - name: Generate environment file
+              run: |
+                  mkdir -p src/environments
+                  cat > src/environments/environments.ts << EOF
+                  export const environment = {
+                      production: false,
+                      firebase: {
+                      apiKey: "",
+                      authDomain: "",
+                      projectId: "",
+                      storageBucket: "",
+                      messagingSenderId: "",
+                      appId: "",
+                      measurementId: ""
+                      }
+                  };
+                  export const TMDB_API_KEY = "";
+                  EOF
+
             - name: Run tests with coverage
               run: npm run test:coverage
 
