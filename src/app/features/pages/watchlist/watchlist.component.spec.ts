@@ -4,16 +4,10 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { FilterService } from '../../../shared/services/filter/filter.service';
 import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
-import { PopupService } from '../../../shared/services/popup/popup.service';
 import { WatchlistMembersCountPipe } from '../../../shared/pipes/watchlist-members-count.pipe';
-import { Subject, of } from 'rxjs';
-import {
-    CONTENT_TYPE,
-    CONTENT_VIEW_TYPE,
-    PAGE_VIEW_TYPE,
-    POPUP,
-} from '../../../shared/models/models';
-import { Component, signal, ElementRef } from '@angular/core';
+import { Subject } from 'rxjs';
+import { CONTENT_TYPE, CONTENT_VIEW_TYPE, POPUP } from '../../../shared/models/models';
+import { Component, signal } from '@angular/core';
 
 @Component({
     selector: 'app-watchlist-mock',
@@ -30,7 +24,6 @@ describe('WatchlistComponent', () => {
     let mockAuthService: any;
     let mockFilterService: any;
     let mockWatchlistService: any;
-    let mockPopupService: any;
     let mockPipe: any;
 
     let userSubject$: Subject<any>;
@@ -52,7 +45,6 @@ describe('WatchlistComponent', () => {
 
         mockRouter = { navigate: vi.fn() };
         mockAuthService = { user$: userSubject$.asObservable() };
-        mockPopupService = { close: vi.fn() };
         mockPipe = { transform: vi.fn(() => '2 membres') };
 
         mockFilterService = {
@@ -77,7 +69,6 @@ describe('WatchlistComponent', () => {
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: FilterService, useValue: mockFilterService },
                 { provide: WatchlistService, useValue: mockWatchlistService },
-                { provide: PopupService, useValue: mockPopupService },
                 { provide: WatchlistMembersCountPipe, useValue: mockPipe },
             ],
         }).compileComponents();
@@ -171,7 +162,9 @@ describe('WatchlistComponent', () => {
 
         it('should forward view layout targets toward global filterService tracking properties', () => {
             component.setView(CONTENT_VIEW_TYPE.SEEN);
-            expect(mockFilterService.setContentViewType(CONTENT_VIEW_TYPE.SEEN));
+            expect(mockFilterService.setContentViewType).toHaveBeenCalledWith(
+                CONTENT_VIEW_TYPE.SEEN,
+            );
         });
     });
 
@@ -193,24 +186,30 @@ describe('WatchlistComponent', () => {
                     expect(component.selectedInfo()).toEqual(dummyData);
                 }
             });
+        });
 
-            it(`should toggle visibility trackers off over ${signalName} flags on closePopup hooks`, () => {
-                (component as any)[signalName].set(true);
-                component.closePopup(type);
-                expect((component as any)[signalName]()).toBe(false);
-                expect(mockPopupService.close).toHaveBeenCalled();
+        // ADD_MEMBERS has a special side effect on close, tested separately below
+        popupMapping
+            .filter((p) => p.type !== POPUP.ADD_MEMBERS)
+            .forEach(({ type, signalName }) => {
+                it(`should toggle visibility trackers off over ${signalName} flags on closePopup hooks`, () => {
+                    (component as any)[signalName].set(true);
+                    component.closePopup(type);
+                    expect((component as any)[signalName]()).toBe(false);
+                });
             });
+
+        it('should do nothing on openPopup with unrecognized popup type', () => {
+            expect(() => component.openPopup('UNKNOWN' as any)).not.toThrow();
+            expect(component.showDetailsPopup()).toBe(false);
+            expect(component.showNewWatchlistPopup()).toBe(false);
+            expect(component.showWatchlistsPopup()).toBe(false);
+            expect(component.showMembersPopup()).toBe(false);
+            expect(component.showAddMembersPopup()).toBe(false);
         });
 
-        it('should call default fallback closings on undefined or unrecognized open criteria parameters', () => {
-            component.openPopup('UNKNOWN' as any);
-            expect(mockPopupService.close).toHaveBeenCalled();
-        });
-
-        it('should exit close chains cleanly without service calls if popup types do not exist', () => {
-            mockPopupService.close.mockClear();
-            component.closePopup('UNKNOWN' as any);
-            expect(mockPopupService.close).not.toHaveBeenCalled();
+        it('should do nothing on closePopup with unrecognized popup type', () => {
+            expect(() => component.closePopup('UNKNOWN' as any)).not.toThrow();
         });
 
         it('should handle nested toggle adjustments specifically customized for ADD_MEMBERS removals', () => {
@@ -221,7 +220,6 @@ describe('WatchlistComponent', () => {
 
             expect(component.showAddMembersPopup()).toBe(false);
             expect(component.showMembersPopup()).toBe(true);
-            expect(mockPopupService.close).toHaveBeenCalled();
         });
     });
 

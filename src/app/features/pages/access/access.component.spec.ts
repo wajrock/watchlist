@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
 import { AccessComponent, ACCESS_VIEW } from './access.component';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 
@@ -8,8 +9,11 @@ describe('AccessComponent', () => {
     let fixture: ComponentFixture<AccessComponent>;
     let mockRouter: any;
     let mockAuthService: any;
+    let userSubject$: BehaviorSubject<any>;
 
     beforeEach(async () => {
+        userSubject$ = new BehaviorSubject<any>(null);
+
         mockRouter = {
             navigateByUrl: vi.fn(),
             navigate: vi.fn(),
@@ -19,6 +23,7 @@ describe('AccessComponent', () => {
             checkUserExists: vi.fn(),
             login: vi.fn(),
             signUp: vi.fn(),
+            user$: userSubject$.asObservable(),
         };
 
         await TestBed.configureTestingModule({
@@ -104,7 +109,9 @@ describe('AccessComponent', () => {
         });
 
         it('should successfully log in and navigate to root page', async () => {
-            mockAuthService.login.mockResolvedValue(null);
+            mockAuthService.login.mockImplementation(async () => {
+                userSubject$.next({ uid: 'test-uid' });
+            });
             component.username.set('user');
             component.password.set('pass');
 
@@ -136,7 +143,9 @@ describe('AccessComponent', () => {
         });
 
         it('should successfully sign up and navigate to root page', async () => {
-            mockAuthService.signUp.mockResolvedValue(null);
+            mockAuthService.signUp.mockImplementation(async () => {
+                userSubject$.next({ uid: 'test-uid' });
+            });
 
             await component.signup();
 

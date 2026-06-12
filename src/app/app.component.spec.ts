@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { ActivatedRoute, Router, NavigationEnd, provideRouter } from '@angular/router';
 import { ToastService } from './shared/services/toast/toast.service';
-import { PopupService } from './shared/services/popup/popup.service';
+import { NavbarService } from './shared/services/navbar/navbar.service';
 import { Subject } from 'rxjs';
 
 describe('AppComponent', () => {
@@ -12,7 +12,7 @@ describe('AppComponent', () => {
     let mockRouterEvents$: Subject<any>;
 
     let mockToastService: any;
-    let mockPopupService: any;
+    let mockNavbarService: any;
     let mockActivatedRoute: any;
 
     beforeEach(async () => {
@@ -22,8 +22,10 @@ describe('AppComponent', () => {
             currentToast: vi.fn().mockReturnValue(null),
         };
 
-        mockPopupService = {
-            isPopupOpen: vi.fn().mockReturnValue(false),
+        mockNavbarService = {
+            showNavbar: vi.fn().mockReturnValue(true),
+            show: vi.fn(),
+            hide: vi.fn(),
         };
 
         mockActivatedRoute = {
@@ -37,7 +39,7 @@ describe('AppComponent', () => {
                 provideRouter([]),
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
                 { provide: ToastService, useValue: mockToastService },
-                { provide: PopupService, useValue: mockPopupService },
+                { provide: NavbarService, useValue: mockNavbarService },
             ],
         }).compileComponents();
 
@@ -55,25 +57,36 @@ describe('AppComponent', () => {
         expect(component.title).toEqual('watch-app');
     });
 
-    describe('Navigation Events & Navbar Visibility Matrix', () => {
-        it('should bypass data evaluations if events are not instances of NavigationEnd', () => {
+    describe('Navigation Events & Navbar Visibility', () => {
+        it('should not call show/hide if events are not instances of NavigationEnd', () => {
             fixture.detectChanges();
             mockRouterEvents$.next({ id: 99, url: '/dummy' });
 
-            expect(component.showNavbar()).toBe(false);
+            expect(mockNavbarService.show).not.toHaveBeenCalled();
+            expect(mockNavbarService.hide).not.toHaveBeenCalled();
         });
 
-        it('should map active route configurations and show navbar by default on clean navigation cycle', () => {
+        it('should call show() when route data showNavbar is true', () => {
             fixture.detectChanges();
 
             const navigationEndEvent = new NavigationEnd(1, '/dashboard', '/dashboard');
             mockRouterEvents$.next(navigationEndEvent);
-            fixture.detectChanges();
 
-            expect(component.showNavbar()).toBe(true);
+            expect(mockNavbarService.show).toHaveBeenCalled();
         });
 
-        it('should traverse nested route structures via firstChild paths to evaluate navbar configurations', () => {
+        it('should call hide() when route data showNavbar is false', () => {
+            fixture.detectChanges();
+
+            mockActivatedRoute.snapshot.data = { showNavbar: false };
+
+            const navigationEndEvent = new NavigationEnd(2, '/login', '/login');
+            mockRouterEvents$.next(navigationEndEvent);
+
+            expect(mockNavbarService.hide).toHaveBeenCalled();
+        });
+
+        it('should traverse nested route structures via firstChild to evaluate showNavbar', () => {
             fixture.detectChanges();
 
             const mockChildRoute = {
@@ -82,22 +95,10 @@ describe('AppComponent', () => {
             };
             mockActivatedRoute.firstChild = mockChildRoute;
 
-            const navigationEndEvent = new NavigationEnd(2, '/login', '/login');
+            const navigationEndEvent = new NavigationEnd(3, '/login', '/login');
             mockRouterEvents$.next(navigationEndEvent);
-            fixture.detectChanges();
 
-            expect(component.showNavbar()).toBe(false);
-        });
-
-        it('should hide navbar if route properties evaluate to true but active popup screens are open', () => {
-            fixture.detectChanges();
-            mockPopupService.isPopupOpen.mockReturnValue(true);
-
-            const navigationEndEvent = new NavigationEnd(3, '/dashboard', '/dashboard');
-            mockRouterEvents$.next(navigationEndEvent);
-            fixture.detectChanges();
-
-            expect(component.showNavbar()).toBe(false);
+            expect(mockNavbarService.hide).toHaveBeenCalled();
         });
     });
 });

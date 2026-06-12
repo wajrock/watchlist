@@ -1,43 +1,73 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PopupService } from '../../services/popup/popup.service';
 import { PopupComponent } from './popup.component';
+import { NavbarService } from '../../services/navbar/navbar.service';
+import { signal } from '@angular/core';
 
 describe('PopupComponent', () => {
     let component: PopupComponent;
     let fixture: ComponentFixture<PopupComponent>;
-    let mockPopupService: any;
+    let mockNavbarService: any;
+    let showNavbarSignal: any;
 
     beforeEach(async () => {
-        mockPopupService = {
-            isPopupOpen: {
-                set: vi.fn(),
-            },
+        showNavbarSignal = signal(true);
+
+        mockNavbarService = {
+            showNavbar: showNavbarSignal,
+            show: vi.fn(),
+            hide: vi.fn(),
         };
 
         await TestBed.configureTestingModule({
             imports: [PopupComponent],
-            providers: [{ provide: PopupService, useValue: mockPopupService }],
+            providers: [{ provide: NavbarService, useValue: mockNavbarService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(PopupComponent);
         component = fixture.componentInstance;
     });
 
-    it('should create and set popup open on init', () => {
+    it('should create and hide navbar on init', () => {
         fixture.detectChanges();
         expect(component).toBeTruthy();
-        expect(mockPopupService.isPopupOpen.set).toHaveBeenCalledWith(true);
+        expect(mockNavbarService.hide).toHaveBeenCalled();
     });
 
-    it('should close popup and emit event when closePopup is invoked', () => {
+    it('should set hideNavbarOnClose to false when navbar was visible before opening', () => {
+        showNavbarSignal.set(true);
+        fixture.detectChanges();
+
+        expect(component.hideNavbarOnClose()).toBe(false);
+    });
+
+    it('should set hideNavbarOnClose to true when navbar was already hidden before opening', () => {
+        showNavbarSignal.set(false);
+        fixture.detectChanges();
+
+        expect(component.hideNavbarOnClose()).toBe(true);
+    });
+
+    it('should emit close and show navbar when closePopup is invoked and navbar was visible before', () => {
         const emitSpy = vi.spyOn(component.close, 'emit');
+        showNavbarSignal.set(true);
         fixture.detectChanges();
 
         component.closePopup();
 
-        expect(mockPopupService.isPopupOpen.set).toHaveBeenCalledWith(false);
         expect(emitSpy).toHaveBeenCalled();
+        expect(mockNavbarService.show).toHaveBeenCalled();
+    });
+
+    it('should emit close and keep navbar hidden when closePopup is invoked and navbar was hidden before', () => {
+        const emitSpy = vi.spyOn(component.close, 'emit');
+        showNavbarSignal.set(false);
+        fixture.detectChanges();
+
+        component.closePopup();
+
+        expect(emitSpy).toHaveBeenCalled();
+        expect(mockNavbarService.hide).toHaveBeenCalledTimes(2); // once on init, once on close
     });
 
     it('should trigger closePopup on background click when target is the overlay', () => {

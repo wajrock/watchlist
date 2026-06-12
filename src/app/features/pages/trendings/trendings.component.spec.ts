@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TrendingsComponent } from './trendings.component';
 import { FilterService } from '../../../shared/services/filter/filter.service';
-import { PopupService } from '../../../shared/services/popup/popup.service';
 import { TmdbService } from '../../../shared/services/tmdb/tmdb.service';
 import { CONTENT_TYPE } from '../../../shared/models/models';
-import { Subject, of } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Component, signal } from '@angular/core';
 
 @Component({
@@ -19,7 +18,6 @@ describe('TrendingsComponent', () => {
     let fixture: ComponentFixture<TrendingsMockComponent>;
 
     let mockFilterService: any;
-    let mockPopupService: any;
     let mockTmdbService: any;
 
     let trendingsSubject$: Subject<any>;
@@ -35,14 +33,12 @@ describe('TrendingsComponent', () => {
             contentType: contentTypeSignal,
             setContentType: vi.fn((type) => contentTypeSignal.set(type)),
         };
-        mockPopupService = { close: vi.fn() };
         mockTmdbService = { getTrendings: vi.fn(() => trendingsSubject$.asObservable()) };
 
         await TestBed.configureTestingModule({
             imports: [TrendingsMockComponent],
             providers: [
                 { provide: FilterService, useValue: mockFilterService },
-                { provide: PopupService, useValue: mockPopupService },
                 { provide: TmdbService, useValue: mockTmdbService },
             ],
         }).compileComponents();
@@ -82,12 +78,11 @@ describe('TrendingsComponent', () => {
     });
 
     describe('closeDetailsPopup termination workflows', () => {
-        it('should flag visibility parameters off and communicate actions back to core popup systems', () => {
+        it('should flag visibility parameters off', () => {
             component.showDetailsPopup.set(true);
             component.closeDetailsPopup();
 
             expect(component.showDetailsPopup()).toBe(false);
-            expect(mockPopupService.close).toHaveBeenCalled();
         });
     });
 
