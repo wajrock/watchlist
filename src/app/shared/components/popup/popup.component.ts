@@ -6,6 +6,7 @@ import {
     HostListener,
     inject,
     input,
+    OnDestroy,
     OnInit,
     Output,
     Renderer2,
@@ -21,7 +22,7 @@ import { NavbarService } from '../../services/navbar/navbar.service';
     templateUrl: './popup.component.html',
     styleUrl: './popup.component.scss',
 })
-export class PopupComponent implements OnInit {
+export class PopupComponent implements OnInit, OnDestroy {
     private startY = 0;
     private currentY = 0;
     private threshold = 150;
@@ -42,13 +43,16 @@ export class PopupComponent implements OnInit {
         this.navbarService.hide();
     }
 
-    closePopup(): void {
-        this.close.emit();
+    ngOnDestroy(): void {
         if (this.hideNavbarOnClose()) {
             this.navbarService.hide();
         } else {
             this.navbarService.show();
         }
+    }
+
+    closePopup(): void {
+        this.close.emit();
     }
 
     onBackgroundClick(event: MouseEvent): void {
