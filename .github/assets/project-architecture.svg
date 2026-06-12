@@ -1,0 +1,48 @@
+<svg viewBox="0 0 1500 380" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7a7a7a" />
+    </marker>
+  </defs>
+
+  <g stroke="#7a7a7a" stroke-width="2" fill="none" marker-end="url(#arrow)">
+ 
+    <line x1="280" y1="105" x2="320" y2="105" />
+
+    <line x1="580" y1="105" x2="620" y2="105" />
+
+    <line x1="880" y1="105" x2="920" y2="105" />
+
+    <line x1="1180" y1="105" x2="1220" y2="105" />
+
+    <line x1="450" y1="150" x2="450" y2="220" />
+  </g>
+
+  <text x="470" y="190" fill="#9a9a9a" font-size="15">keys stored in</text>
+
+  <rect x="20" y="60" width="260" height="90" rx="12" fill="#1f4a3a" stroke="#2f6e54" stroke-width="1.5" />
+  <text x="150" y="98" fill="#d7f0e3" font-size="21" font-weight="700" text-anchor="middle">User Query</text>
+  <text x="150" y="126" fill="#9fd9c3" font-size="15" text-anchor="middle">Natural language, any language</text>
+
+  <rect x="320" y="60" width="260" height="90" rx="12" fill="#5c3a12" stroke="#8a5a1f" stroke-width="1.5" />
+  <text x="450" y="98" fill="#ffe0b3" font-size="21" font-weight="700" text-anchor="middle">Cloud Function</text>
+  <text x="450" y="126" fill="#e0a85f" font-size="15" text-anchor="middle">Orchestrates the request</text>
+
+  <rect x="620" y="60" width="260" height="90" rx="12" fill="#3a3580" stroke="#5852b0" stroke-width="1.5" />
+  <text x="750" y="98" fill="#e3e0ff" font-size="21" font-weight="700" text-anchor="middle">Gemini API</text>
+  <text x="750" y="126" fill="#b6aef0" font-size="15" text-anchor="middle">Suggests 9 relevant titles</text>
+
+  <rect x="920" y="60" width="260" height="90" rx="12" fill="#1f3a66" stroke="#355c99" stroke-width="1.5" />
+  <text x="1050" y="98" fill="#d0e3ff" font-size="21" font-weight="700" text-anchor="middle">TMDB API</text>
+  <text x="1050" y="126" fill="#8fb8f0" font-size="15" text-anchor="middle">Resolves metadata in parallel</text>
+
+  <rect x="1220" y="60" width="260" height="90" rx="12" fill="#1f4a3a" stroke="#2f6e54" stroke-width="1.5" />
+  <text x="1350" y="98" fill="#d7f0e3" font-size="21" font-weight="700" text-anchor="middle">Results</text>
+  <text x="1350" y="126" fill="#9fd9c3" font-size="15" text-anchor="middle">Displayed to the client</text>
+
+  <rect x="320" y="220" width="260" height="90" rx="12" fill="#5c2424" stroke="#8a3a3a" stroke-width="1.5" />
+  <text x="450" y="258" fill="#ffd6d6" font-size="21" font-weight="700" text-anchor="middle">Secret Manager</text>
+  <text x="450" y="286" fill="#e09a9a" font-size="15" text-anchor="middle">Gemini &amp; TMDB API keys</text>
+
+</svg>

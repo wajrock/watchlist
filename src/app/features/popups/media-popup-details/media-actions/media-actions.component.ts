@@ -1,9 +1,9 @@
-import { Component, computed, input, output, signal } from '@angular/core';
-import { ACTIONS_VIEW, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../../shared/models/models';
-import { ApiMedia, GRADE } from '../../../../shared/models/firebase.models';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { Component, computed, input, output } from '@angular/core';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
+import { ApiMedia, GRADE } from '../../../../shared/models/firebase.models';
+import { ACTIONS_VIEW, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../../shared/models/models';
 
 @Component({
     selector: 'app-media-actions',

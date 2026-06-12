@@ -1,15 +1,12 @@
-import { Component, inject, resource, signal } from '@angular/core';
-import { Functions, httpsCallable } from '@angular/fire/functions';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { MergedMedia } from '../../../shared/models/firebase.models';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
-import { SearchMovieDetails, SearchTvDetails } from '../../../shared/models/tmdb.models';
 import { FilterService } from '../../../shared/services/filter/filter.service';
 import { NavbarService } from '../../../shared/services/navbar/navbar.service';
-import { mapSearchToApiMedia } from '../../../shared/utils/media.utils';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
 import { ClassicSearchComponent } from './classic-search/classic-search.component';
 import { MagicSearchComponent } from './magic-search/magic-search.component';
