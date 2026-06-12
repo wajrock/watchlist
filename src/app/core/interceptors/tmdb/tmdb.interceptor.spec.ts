@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { tmdbInterceptor } from './tmdb.interceptor';
-import { API_KEY } from '../../../../environments/environments';
+import { TMDB_API_KEY } from '../../../../environments/environments';
 
 describe('tmdbInterceptor', () => {
     let httpClient: HttpClient;
@@ -29,7 +29,7 @@ describe('tmdbInterceptor', () => {
 
         const req = httpMock.expectOne('https://api.themoviedb.org/3/movie/popular');
         expect(req.request.headers.has('Authorization')).toBe(true);
-        expect(req.request.headers.get('Authorization')).toBe(`Bearer ${API_KEY}`);
+        expect(req.request.headers.get('Authorization')).toBe(`Bearer ${TMDB_API_KEY}`);
 
         req.flush({});
     });

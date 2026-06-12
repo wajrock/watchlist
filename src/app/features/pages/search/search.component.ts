@@ -1,31 +1,27 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Component, inject, resource, signal } from '@angular/core';
 import { Functions, httpsCallable } from '@angular/fire/functions';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { combineLatest, debounceTime, distinctUntilChanged, map, of, switchMap } from 'rxjs';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { CardComponent } from '../../../shared/components/card/card.component';
-import { SearchbarComponent } from '../../../shared/components/searchbar/searchbar.component';
-import { ApiMedia, MergedMedia } from '../../../shared/models/firebase.models';
+import { MergedMedia } from '../../../shared/models/firebase.models';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
+import { SearchMovieDetails, SearchTvDetails } from '../../../shared/models/tmdb.models';
 import { FilterService } from '../../../shared/services/filter/filter.service';
-import { PopupService } from '../../../shared/services/popup/popup.service';
-import { TmdbService } from '../../../shared/services/tmdb/tmdb.service';
-import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
+import { NavbarService } from '../../../shared/services/navbar/navbar.service';
 import { mapSearchToApiMedia } from '../../../shared/utils/media.utils';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
-
+import { ClassicSearchComponent } from './classic-search/classic-search.component';
+import { MagicSearchComponent } from './magic-search/magic-search.component';
 @Component({
     selector: 'app-search',
     imports: [
-        CardComponent,
         FormsModule,
         MediaPopupDetailsComponent,
         ButtonComponent,
-        SearchbarComponent,
         AvatarComponent,
+        ClassicSearchComponent,
+        MagicSearchComponent,
     ],
     templateUrl: './search.component.html',
     styleUrl: './search.component.scss',
@@ -38,11 +34,8 @@ export class SearchComponent {
 
     // INJECTS
     private router = inject(Router);
-    private watchlistsService = inject(WatchlistService);
-    private tmdbService = inject(TmdbService);
+    private navbarService = inject(NavbarService);
     protected filterService = inject(FilterService);
-    private popupService = inject(PopupService);
-    private functions = inject(Functions);
 
     // Signals
     selectedInfo = signal<CardInfo | null>(null);
@@ -50,48 +43,12 @@ export class SearchComponent {
     showDetailsPopup = signal<boolean>(false);
     isMagicSearchActivated = signal<boolean>(false);
 
-    activeWatchlist = toSignal(this.watchlistsService.activeWatchlist$);
     fullCollection = signal<MergedMedia[]>([]);
 
     searchValue = signal<string>('');
     contentTypeFilter = this.filterService.contentType;
 
-    // Async State
-    searchResults = toSignal(
-        combineLatest([toObservable(this.searchValue), toObservable(this.contentTypeFilter)]).pipe(
-            debounceTime(100),
-            distinctUntilChanged(),
-            switchMap(([value, type]) => {
-                if (value.length < 2) return of(null);
-                return this.tmdbService
-                    .search(type, value)
-                    .pipe(
-                        map((response) =>
-                            response.results.map((item) =>
-                                mapSearchToApiMedia(item, this.contentTypeFilter()),
-                            ),
-                        ),
-                    );
-            }),
-        ),
-        { initialValue: null },
-    );
-
-    // Computed
-    filteredSearchResults = computed<ApiMedia[]>(() => {
-        const searchResults = this.searchResults();
-        const watchlist = this.activeWatchlist();
-        if (!searchResults) return [];
-        return searchResults
-            ?.filter(
-                (item) => !watchlist?.medias.some((media) => media.mediaDetails.id === item.id),
-            )
-            ?.filter((item) => item.backdropPath)
-            .sort((a, b) => b.popularity - a.popularity)
-            .map((item) => {
-                return item;
-            });
-    });
+    geminiSearchQuery = signal('');
 
     // METHODS
     switchView() {
@@ -103,6 +60,11 @@ export class SearchComponent {
 
     switchSearchType() {
         this.isMagicSearchActivated.update((value) => !value);
+        if (this.isMagicSearchActivated()) {
+            this.navbarService.hide();
+        } else {
+            this.navbarService.show();
+        }
     }
 
     closeSearchPage() {
@@ -116,7 +78,6 @@ export class SearchComponent {
 
     closeDetailsPopup() {
         this.showDetailsPopup.set(false);
-        this.popupService.close();
     }
 
     onMediaAddedToWatchlist(): void {
@@ -124,17 +85,6 @@ export class SearchComponent {
     }
 
     async onSearchSubmit() {
-        try {
-            const askGeminiFn = httpsCallable<
-                { prompt: string },
-                { success: boolean; text: string }
-            >(this.functions, 'askGemini');
-
-            const response = await askGeminiFn({ prompt: this.searchValue() });
-
-            return response.data.text;
-        } catch (error) {
-            throw error;
-        }
+        this.geminiSearchQuery.set(this.searchValue());
     }
 }

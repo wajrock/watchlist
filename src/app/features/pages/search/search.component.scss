@@ -19,51 +19,6 @@
     margin-left: unset;
 }
 
-.search-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 0.5rem;
-    --header-height: 2.75rem;
-    height: var(--header-height);
-    position: relative;
-
-    &::ng-deep {
-        .searchbar {
-            height: var(--header-height);
-            width: 100%;
-        }
-    }
-}
-
-.submit-search-btn {
-    --height: 2.625rem;
-}
-
-.searchbar-component {
-    width: 100%;
-}
-
-.filters {
-    display: flex;
-    width: 100%;
-    gap: 0.5rem;
-}
-
-.results-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
-    width: 100%;
-    gap: 0.5rem;
-    padding-bottom: 3rem;
-
-    &-item {
-        scroll-snap-align: start;
-    }
-
-    &-empty {
-        color: var(--secondary-text-color);
-        padding: 1rem;
-        text-align: center;
-        grid-column: 1 / -1;
-    }
+.content {
+    height: 100%;
 }

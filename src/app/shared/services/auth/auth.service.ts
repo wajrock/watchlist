@@ -51,7 +51,7 @@ export class AuthService {
 
         const usersRef = collection(this.firestore, 'users');
         const q = query(usersRef, where('username', '==', username), limit(1));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await runInInjectionContext(this.injector, () => getDocs(q));
 
         return !querySnapshot.empty;
     }

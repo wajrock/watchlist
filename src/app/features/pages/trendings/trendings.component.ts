@@ -5,7 +5,6 @@ import { AvatarComponent } from '../../../shared/components/avatar/avatar.compon
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
 import { FilterService } from '../../../shared/services/filter/filter.service';
-import { PopupService } from '../../../shared/services/popup/popup.service';
 import { TmdbService } from '../../../shared/services/tmdb/tmdb.service';
 import { mapDetailsToApiMedia } from '../../../shared/utils/media.utils';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
@@ -17,17 +16,20 @@ import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/med
     styleUrl: './trendings.component.scss',
 })
 export class TrendingsComponent {
+    // UTILS
     readonly PAGE_VIEW_TYPE = PAGE_VIEW_TYPE;
     readonly CONTENT_TYPE = CONTENT_TYPE;
     readonly Array = Array;
 
+    // INJECTS
     private tmdbService = inject(TmdbService);
     protected filterService = inject(FilterService);
-    private popupService = inject(PopupService);
 
+    // SIGNALS
     selectedInfo = signal<CardInfo | null>(null);
     showDetailsPopup = signal<boolean>(false);
 
+    // RESOURCE
     trendingsResource = rxResource({
         request: this.filterService.contentType,
         loader: ({ request: contentType }) =>
@@ -40,6 +42,7 @@ export class TrendingsComponent {
             ),
     });
 
+    // METHODS
     switchView() {
         const newType =
             this.filterService.contentType() === CONTENT_TYPE.MOVIE
@@ -56,6 +59,5 @@ export class TrendingsComponent {
 
     closeDetailsPopup() {
         this.showDetailsPopup.set(false);
-        this.popupService.close();
     }
 }

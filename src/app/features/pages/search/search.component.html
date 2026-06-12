@@ -12,65 +12,16 @@
         <app-avatar class="user-avatar"></app-avatar>
     </header>
 
-    <div class="search-header">
-        <app-searchbar
-            class="searchbar-component"
-            [placeholder]="
-                isMagicSearchActivated()
-                    ? 'Décrivez ce que vous voulez voir'
-                    : 'Rechercher par titre..'
-            "
-            inputName="medias-search"
-            inputId="medias-search"
-            [searchValue]="searchValue()"
-            (onSearchChanged)="this.searchValue.set($event)"
-        ></app-searchbar>
-        @if (isMagicSearchActivated()) {
-            <app-button
-                class="submit-search-btn"
-                customClass="btn-default btn-bordered btn-round"
-                (action)="onSearchSubmit()"
-            >
-                <i class="fa-solid fa-magnifying-glass"></i>
-            </app-button>
-        }
-    </div>
-
-    @if (!isMagicSearchActivated()) {
-        <section class="content-type-filters">
-            <div
-                class="content-type-filter"
-                [class.active]="filterService.contentType() === CONTENT_TYPE.MOVIE"
-                (click)="filterService.setContentType(CONTENT_TYPE.MOVIE)"
-            >
-                Films
-            </div>
-            <div
-                class="content-type-filter"
-                [class.active]="filterService.contentType() === CONTENT_TYPE.TV"
-                (click)="filterService.setContentType(CONTENT_TYPE.TV)"
-            >
-                Séries
-            </div>
-        </section>
-    }
-
-    @if (searchValue().length > 1) {
-        <div class="results-grid">
-            @for (item of filteredSearchResults(); track item.id) {
-                @if (item.posterPath) {
-                    <app-card
-                        class="results-grid-item"
-                        [posterPath]="item.posterPath"
-                        (openDetails)="handleShowDetails(item)"
-                    ></app-card>
-                }
-            } @empty {
-                @if (searchResults()) {
-                    <p class="results-grid-empty">Aucun résultats</p>
-                }
-            }
-        </div>
+    @if (isMagicSearchActivated()) {
+        <app-magic-search
+            class="content"
+            (onCardClicked)="handleShowDetails($event)"
+        ></app-magic-search>
+    } @else {
+        <app-classic-search
+            class="content"
+            (onCardClicked)="handleShowDetails($event)"
+        ></app-classic-search>
     }
 </main>
 

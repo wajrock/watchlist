@@ -1,4 +1,6 @@
 import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { filter, take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
@@ -62,6 +64,7 @@ export class AccessComponent {
     @ViewChild('passwordInput') passwordInput!: ElementRef<HTMLInputElement>;
     @ViewChild('confirmPasswordInput') confirmPasswordInput!: ElementRef<HTMLInputElement>;
 
+    // METHODS
     onUsernameInput(event: Event): void {
         const input = event.target as HTMLInputElement;
         this.username.set(input.value.trim());
@@ -104,6 +107,12 @@ export class AccessComponent {
     async login() {
         try {
             await this.authService.login(this.username(), this.password());
+            await firstValueFrom(
+                this.authService.user$.pipe(
+                    filter((u) => u !== null),
+                    take(1),
+                ),
+            );
             this.router.navigate(['/'], { replaceUrl: true });
         } catch (error: any) {
             this.formErrorMessage.set(error.message);
@@ -118,6 +127,12 @@ export class AccessComponent {
     async signup() {
         try {
             await this.authService.signUp(this.username(), this.password(), this.name());
+            await firstValueFrom(
+                this.authService.user$.pipe(
+                    filter((u) => u !== null),
+                    take(1),
+                ),
+            );
             this.router.navigate(['/'], { replaceUrl: true });
         } catch (error: any) {
             if (error.code === 'auth/weak-password') {

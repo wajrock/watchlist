@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, EnvironmentInjector, runInInjectionContext } from '@angular/core';
 import {
     addDoc,
     arrayUnion,
@@ -27,6 +27,7 @@ import {
 })
 export class CollectionService {
     private firestore = inject(Firestore);
+    private injector = inject(EnvironmentInjector);
 
     getWatchlists(userId: string): Observable<WatchlistItem[]> {
         const watchlistsRef = collection(this.firestore, 'watchlists');
@@ -58,7 +59,7 @@ export class CollectionService {
 
         const q = query(filmsRef, where('apiId', '==', apiId), where('type', '==', mediaType));
 
-        return from(getDocs(q)).pipe(
+        return from(runInInjectionContext(this.injector, () => getDocs(q))).pipe(
             map((snapshot) => {
                 if (snapshot.docs.length > 0) {
                     return snapshot.docs[0].id;
@@ -128,7 +129,7 @@ export class CollectionService {
     ): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(getDoc(watchlistRef)).pipe(
+        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
             switchMap((snapshot) => {
                 const data = snapshot.data() as WatchlistItem;
                 if (!snapshot.exists() || !data.medias) return of(false);
@@ -146,7 +147,7 @@ export class CollectionService {
     updateMediaGrade(watchlistId: string, idMedia: string, grade: GRADE): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(getDoc(watchlistRef)).pipe(
+        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
             switchMap((snapshot) => {
                 const data = snapshot.data() as WatchlistItem;
                 if (!snapshot.exists() || !data.medias) return of(false);
@@ -168,7 +169,7 @@ export class CollectionService {
     ): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(getDoc(watchlistRef)).pipe(
+        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
             switchMap((snapshot) => {
                 const data = snapshot.data() as WatchlistItem;
                 if (!snapshot.exists() || !data.medias) return of(false);
@@ -192,7 +193,7 @@ export class CollectionService {
     removeMediaFromWatchlist(watchlistId: string, idMedia: string): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(getDoc(watchlistRef)).pipe(
+        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
             switchMap((snapshot) => {
                 if (!snapshot.exists()) return of(false);
 

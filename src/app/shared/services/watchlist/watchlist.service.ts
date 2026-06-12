@@ -43,77 +43,83 @@ export class WatchlistService {
     private _activeId = signal<string | null>(localStorage.getItem('activeWatchlistId'));
     readonly activeId = this._activeId.asReadonly();
 
-    watchlists$ = this.authService.user$.pipe(
-        switchMap((user) => {
-            if (!user) return of([]);
+    watchlists$!: Observable<WatchlistItem[]>;
+    watchlistInvitations$!: Observable<WatchlistItem[]>;
+    activeWatchlist$!: Observable<EnrichedWatchlist | null>;
 
-            return (
-                collectionData(collection(this.firestore, 'watchlists'), {
-                    idField: 'uidWatchlist',
-                }) as Observable<WatchlistItem[]>
-            ).pipe(
-                map((lists) =>
-                    lists
-                        .filter((list) =>
+    constructor() {
+        this.watchlists$ = this.authService.user$.pipe(
+            switchMap((user) => {
+                if (!user) return of([]);
+
+                return (
+                    collectionData(collection(this.firestore, 'watchlists'), {
+                        idField: 'uidWatchlist',
+                    }) as Observable<WatchlistItem[]>
+                ).pipe(
+                    map((lists) =>
+                        lists
+                            .filter((list) =>
+                                list.members.some(
+                                    (member) => member.id === user.uid && member.invitationAccepted,
+                                ),
+                            )
+                            .sort((a, b) => {
+                                return (
+                                    new Date(b.creationTime).getTime() -
+                                    new Date(a.creationTime).getTime()
+                                );
+                            }),
+                    ),
+                );
+            }),
+            shareReplay(1),
+        );
+
+        this.watchlistInvitations$ = this.authService.user$.pipe(
+            switchMap((user) => {
+                if (!user) return of([]);
+
+                return (
+                    collectionData(collection(this.firestore, 'watchlists'), {
+                        idField: 'uidWatchlist',
+                    }) as Observable<WatchlistItem[]>
+                ).pipe(
+                    map((lists) =>
+                        lists.filter((list) =>
                             list.members.some(
-                                (member) => member.id === user.uid && member.invitationAccepted,
+                                (member) => member.id === user.uid && !member.invitationAccepted,
                             ),
-                        )
-                        .sort((a, b) => {
-                            return (
-                                new Date(b.creationTime).getTime() -
-                                new Date(a.creationTime).getTime()
-                            );
-                        }),
-                ),
-            );
-        }),
-        shareReplay(1),
-    );
-
-    watchlistInvitations$ = this.authService.user$.pipe(
-        switchMap((user) => {
-            if (!user) return of([]);
-
-            return (
-                collectionData(collection(this.firestore, 'watchlists'), {
-                    idField: 'uidWatchlist',
-                }) as Observable<WatchlistItem[]>
-            ).pipe(
-                map((lists) =>
-                    lists.filter((list) =>
-                        list.members.some(
-                            (member) => member.id === user.uid && !member.invitationAccepted,
                         ),
                     ),
-                ),
-            );
-        }),
-        shareReplay(1),
-    );
+                );
+            }),
+            shareReplay(1),
+        );
 
-    activeWatchlist$ = toObservable(this.activeId).pipe(
-        switchMap((id) =>
-            id
-                ? (docData(doc(this.firestore, `watchlists/${id}`), {
-                      idField: 'uidWatchlist',
-                  }) as Observable<WatchlistItem>)
-                : of(null),
-        ),
+        this.activeWatchlist$ = toObservable(this.activeId).pipe(
+            switchMap((id) =>
+                id
+                    ? (docData(doc(this.firestore, `watchlists/${id}`), {
+                          idField: 'uidWatchlist',
+                      }) as Observable<WatchlistItem>)
+                    : of(null),
+            ),
 
-        switchMap((watchlist) => {
-            if (!watchlist) return of(null);
+            switchMap((watchlist) => {
+                if (!watchlist) return of(null);
 
-            const userIds = [...new Set(watchlist.members.map((member) => member.id))];
-            const mediaIds = [...new Set(watchlist.medias.map((m) => m.idMedia))];
+                const userIds = [...new Set(watchlist.members.map((member) => member.id))];
+                const mediaIds = [...new Set(watchlist.medias.map((m) => m.idMedia))];
 
-            return combineLatest([
-                this.getCollectionByIds<User>('users', 'uid', userIds),
-                this.getCollectionByIds<ApiMedia>('medias', documentId(), mediaIds, 'uidMedia'),
-            ]).pipe(map(([users, medias]) => this.enrichWatchlist(watchlist, users, medias)));
-        }),
-        shareReplay(1),
-    );
+                return combineLatest([
+                    this.getCollectionByIds<User>('users', 'uid', userIds),
+                    this.getCollectionByIds<ApiMedia>('medias', documentId(), mediaIds, 'uidMedia'),
+                ]).pipe(map(([users, medias]) => this.enrichWatchlist(watchlist, users, medias)));
+            }),
+            shareReplay(1),
+        );
+    }
 
     getCollectionByIds<T>(
         path: string,

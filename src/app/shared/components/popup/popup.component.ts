@@ -9,10 +9,11 @@ import {
     OnInit,
     Output,
     Renderer2,
+    signal,
     ViewChild,
 } from '@angular/core';
-import { PopupService } from '../../services/popup/popup.service';
 import { ButtonComponent } from '../button/button.component';
+import { NavbarService } from '../../services/navbar/navbar.service';
 
 @Component({
     selector: 'app-popup',
@@ -26,21 +27,28 @@ export class PopupComponent implements OnInit {
     private threshold = 150;
     private isDragging = false;
     private renderer = inject(Renderer2);
-    private popupService = inject(PopupService);
+    private navbarService = inject(NavbarService);
 
     animateOnInit = input<boolean>(true);
     displayCloseBtn = input<boolean>(false);
+    hideNavbarOnClose = signal<boolean>(false);
 
     @Output() close = new EventEmitter<void>();
 
     @ViewChild('popup') popupContent!: ElementRef;
 
     ngOnInit(): void {
-        this.popupService.isPopupOpen.set(true);
+        this.hideNavbarOnClose.set(!this.navbarService.showNavbar());
+        this.navbarService.hide();
     }
+
     closePopup(): void {
-        this.popupService.isPopupOpen.set(false);
         this.close.emit();
+        if (this.hideNavbarOnClose()) {
+            this.navbarService.hide();
+        } else {
+            this.navbarService.show();
+        }
     }
 
     onBackgroundClick(event: MouseEvent): void {

@@ -1,0 +1,45 @@
+<section class="classic-search">
+    <div class="search-header">
+        <app-searchbar
+            class="searchbar-component"
+            [placeholder]="'Rechercher par titre..'"
+            inputName="medias-search"
+            inputId="medias-search"
+            [searchValue]="searchValue()"
+            (onSearchChanged)="this.searchValue.set($event)"
+        ></app-searchbar>
+    </div>
+
+    <section class="content-type-filters">
+        <div
+            class="content-type-filter"
+            [class.active]="filterService.contentType() === CONTENT_TYPE.MOVIE"
+            (click)="filterService.setContentType(CONTENT_TYPE.MOVIE)"
+        >
+            Films
+        </div>
+        <div
+            class="content-type-filter"
+            [class.active]="filterService.contentType() === CONTENT_TYPE.TV"
+            (click)="filterService.setContentType(CONTENT_TYPE.TV)"
+        >
+            Séries
+        </div>
+    </section>
+
+    @if (searchValue().length > 1) {
+        <div class="results-grid">
+            @for (item of filteredSearchResults(); track item.id) {
+                @if (item.posterPath) {
+                    <app-card
+                        class="results-grid-item"
+                        [posterPath]="item.posterPath"
+                        (openDetails)="onCardClicked.emit(item)"
+                    ></app-card>
+                }
+            } @empty {
+                <p class="results-grid-empty">Aucun résultats</p>
+            }
+        </div>
+    }
+</section>

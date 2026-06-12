@@ -19,13 +19,11 @@ import { WatchlistMembersCountPipe } from '../../../shared/pipes/watchlist-membe
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { FilterService } from '../../../shared/services/filter/filter.service';
 import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
+import { AddMembersPopupComponent } from '../../popups/add-members-popup/add-members-popup.component';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
+import { MembersPopupComponent } from '../../popups/members-popup/members-popup.component';
 import { NewWatchlistPopupComponent } from '../../popups/new-watchlist-popup/new-watchlist-popup.component';
 import { WatchlistsPopupComponent } from '../../popups/watchlists-popup/watchlists-popup.component';
-import { WatchlistMembersPopupComponent } from '../../popups/watchlist-members-popup/watchlist-members-popup.component';
-import { MembersPopupComponent } from '../../popups/members-popup/members-popup.component';
-import { AddMembersPopupComponent } from '../../popups/add-members-popup/add-members-popup.component';
-import { PopupService } from '../../../shared/services/popup/popup.service';
 
 @Component({
     selector: 'app-watchlist',
@@ -74,7 +72,6 @@ export class WatchlistComponent {
     private authService = inject(AuthService);
     private watchlistService = inject(WatchlistService);
     private filterService = inject(FilterService);
-    private popupService = inject(PopupService);
     protected watchlistMembersCountPipe = inject(WatchlistMembersCountPipe);
 
     // SIGNALS
@@ -155,7 +152,6 @@ export class WatchlistComponent {
                 this.showAddMembersPopup.set(true);
                 break;
             default:
-                this.popupService.close();
                 return;
         }
     }
@@ -181,8 +177,6 @@ export class WatchlistComponent {
             default:
                 return;
         }
-
-        this.popupService.close();
     }
 
     openProfile(): void {

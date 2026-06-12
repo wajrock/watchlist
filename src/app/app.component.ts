@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { RouterOutlet, Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { Toast, TOAST_TYPE } from './shared/models/toast.model';
-import { ToastService } from './shared/services/toast/toast.service';
-import { ToastComponent } from './shared/components/toast/toast.component';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
-import { PopupService } from './shared/services/popup/popup.service';
+import { ToastComponent } from './shared/components/toast/toast.component';
+import { NavbarService } from './shared/services/navbar/navbar.service';
+import { ToastService } from './shared/services/toast/toast.service';
+import { setLogLevel, LogLevel } from '@angular/fire';
 @Component({
     selector: 'app-root',
     imports: [RouterOutlet, ReactiveFormsModule, CommonModule, ToastComponent, NavbarComponent],
@@ -14,25 +14,26 @@ import { PopupService } from './shared/services/popup/popup.service';
     styleUrl: './app.component.scss',
 })
 export class AppComponent {
-    private toastService = inject(ToastService);
-
+    // UTILS
     title = 'watch-app';
 
-    readonly currentToast = this.toastService.currentToast;
+    // INJECTS
+    private toastService = inject(ToastService);
     private router = inject(Router);
     private activatedRoute = inject(ActivatedRoute);
-    private popupService = inject(PopupService);
+    protected navbarService = inject(NavbarService);
 
-    private routeNavbarVisible = signal(false);
-    showNavbar = computed(() => this.routeNavbarVisible() && !this.popupService.isPopupOpen());
+    // SIGNALS
+    readonly currentToast = this.toastService.currentToast;
 
     ngOnInit(): void {
+        setLogLevel(LogLevel.VERBOSE);
         this.router.events.subscribe((e) => {
             if (e instanceof NavigationEnd) {
                 let route = this.activatedRoute;
                 while (route.firstChild) route = route.firstChild;
-                const show = route.snapshot.data && (route.snapshot.data as any).showNavbar;
-                this.routeNavbarVisible.set(show !== false);
+                const showNavbar = route.snapshot.data['showNavbar'] !== false;
+                showNavbar ? this.navbarService.show() : this.navbarService.hide();
             }
         });
     }

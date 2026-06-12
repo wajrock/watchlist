@@ -1,0 +1,58 @@
+<section class="magic-search">
+    @if (searchQuery()) {
+        <div class="results-grid">
+            @if (geminiResponseResource.error()) {
+                <p class="results-grid-message">Veuillez réessayer la recherche</p>
+            }
+            @if (geminiResponseResource.isLoading()) {
+                @for (_ of Array(9); track $index) {
+                    <div class="card-skeleton"></div>
+                }
+            }
+            @if (geminiResponseResource.hasValue()) {
+                @for (media of geminiResponseResource.value(); track media.id) {
+                    @if (media.posterPath) {
+                        <app-card
+                            class="results-grid-item"
+                            [posterPath]="media.posterPath"
+                            (openDetails)="onCardClicked.emit(media)"
+                        ></app-card>
+                    }
+                } @empty {
+                    <p class="results-grid-message">Aucun résultats</p>
+                }
+            }
+        </div>
+    }
+    <div class="search">
+        <textarea
+            name="search"
+            id="search"
+            placeholder="Décrivez ce que vous voulez voir"
+            [value]="searchInput()"
+            (input)="searchInput.set($any($event.target).value)"
+            rows="2"
+        ></textarea>
+        <div class="actions">
+            <div class="content-type-filters">
+                <div
+                    class="content-type-filter"
+                    [class.active]="filterService.contentType() === CONTENT_TYPE.MOVIE"
+                    (click)="filterService.setContentType(CONTENT_TYPE.MOVIE)"
+                >
+                    Films
+                </div>
+                <div
+                    class="content-type-filter"
+                    [class.active]="filterService.contentType() === CONTENT_TYPE.TV"
+                    (click)="filterService.setContentType(CONTENT_TYPE.TV)"
+                >
+                    Séries
+                </div>
+            </div>
+            <app-button class="submit" [customClass]="'btn-cta'" (action)="onSubmitSearch()">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </app-button>
+        </div>
+    </div>
+</section>
