@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
 
@@ -30,7 +29,6 @@ import { WatchlistsPopupComponent } from '../../popups/watchlists-popup/watchlis
     imports: [
         ButtonComponent,
         CommonModule,
-        AvatarComponent,
         NewWatchlistPopupComponent,
         MediaPopupDetailsComponent,
         CardComponent,

@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { MergedMedia } from '../../../shared/models/firebase.models';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
@@ -16,7 +15,6 @@ import { MagicSearchComponent } from './magic-search/magic-search.component';
         FormsModule,
         MediaPopupDetailsComponent,
         ButtonComponent,
-        AvatarComponent,
         ClassicSearchComponent,
         MagicSearchComponent,
     ],

@@ -5,7 +5,7 @@
     <div class="media-details-popup">
         @if (mediaDetails && mediaSeenStatus !== null && mediaGrade !== null) {
             <div class="backdrop-cover">
-                <img [src]="`${IMG_BASE_URL}/w780${mediaDetails.backdropPath}`" alt="" />
+                <img [src]="`${IMG_BASE_URL}/w1280${mediaDetails.backdropPath}`" alt="" />
 
                 <div class="backdrop-cover-overlay"></div>
             </div>
@@ -44,6 +44,7 @@
                         mediaDetails.provider
                     ) {
                         <app-media-infos
+                            class="media-infos"
                             [view]="view()"
                             [mediaDetails]="mediaDetails"
                             [ownerName]="ownerName()"
@@ -52,7 +53,9 @@
                 </div>
             </div>
         } @else {
-            <div class="media-details-skeleton"></div>
+            <div class="media-details-skeleton">
+                <p style="color: white; margin: 5rem">{{ mediaDetails }}</p>
+            </div>
         }
     </div>
 </app-popup>

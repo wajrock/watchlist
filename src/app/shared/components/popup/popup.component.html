@@ -1,12 +1,8 @@
 <section class="popup-overlay" (click)="onBackgroundClick($event)">
     <main #popup class="popup" [class.animate]="animateOnInit()">
-        @if (displayCloseBtn()) {
-            <app-button class="popup-close btn.bordered" (click)="closePopup()"
-                ><i class="fa-solid fa-xmark"></i
-            ></app-button>
-        } @else {
-            <div class="pill"></div>
-        }
+        <app-button class="popup-close btn.bordered" (click)="closePopup()"
+            ><i class="fa-solid fa-xmark"></i
+        ></app-button>
 
         <ng-content class="popup-content"></ng-content>
     </main>

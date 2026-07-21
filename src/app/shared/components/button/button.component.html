@@ -1,6 +1,7 @@
 <div
     class="button"
     [ngClass]="[customClass]"
+    [class.disabled]="disabled()"
     [class.clicked]="isClicked"
     (touchstart)="isClicked = true"
     (touchcancel)="isClicked = false"

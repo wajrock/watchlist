@@ -20,7 +20,7 @@
 .popup-close {
     position: absolute;
     right: 1rem;
-    top: calc(env(safe-area-inset-top) + 1rem);
+    top: env(safe-area-inset-top);
 
     &::ng-deep .button {
         width: 2.25rem !important;
@@ -42,11 +42,5 @@
             transform: scale(0.9);
             background: rgba(255, 255, 255, 0.2);
         }
-    }
-}
-
-@media screen and (min-width: 764px) {
-    .trailer {
-        background-color: red;
     }
 }

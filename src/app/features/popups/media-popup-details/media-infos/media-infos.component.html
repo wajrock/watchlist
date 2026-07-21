@@ -1,11 +1,17 @@
 @let mediaDetails = this.mediaDetails();
 <div class="media-infos">
     <div class="media-infos-header">Infos</div>
-    @if (mediaDetails.overview.length > 0) {
-        <div class="media-overview">
-            <p>{{ mediaDetails.overview }}</p>
-        </div>
-    }
+
+    <div class="media-overview">
+        <p>
+            {{
+                mediaDetails.overview.length > 0
+                    ? mediaDetails.overview
+                    : 'Aucun synopsis disponible.'
+            }}
+        </p>
+    </div>
+
     <div class="media-tags">
         @if (view() === PAGE_VIEW_TYPE.WATCHLIST) {
             <div class="media-owner tag">

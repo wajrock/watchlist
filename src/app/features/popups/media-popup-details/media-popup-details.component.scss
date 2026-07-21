@@ -1,3 +1,8 @@
+:host::ng-deep {
+    .popup {
+        padding-top: 0 !important;
+    }
+}
 .media-details-popup {
     display: flex;
     flex-direction: column;
@@ -7,7 +12,7 @@
     align-items: center;
     width: 100%;
 
-    --height-cover: 35lvh;
+    --height-cover: 50lvh;
 
     .backdrop-cover {
         height: var(--height-cover);
@@ -19,7 +24,6 @@
 
         & img {
             object-fit: cover;
-            object-position: center;
             width: 100%;
             height: 100%;
         }
@@ -66,7 +70,7 @@
     background-color: rgba(255, 255, 255, 0.1);
     animation: skeleton-loading 0.8s linear infinite alternate;
     width: 100%;
-    height: 77.5lvh;
+    height: 100%;
 }
 
 .media-details-content {
@@ -77,14 +81,25 @@
     width: 100%;
     position: relative;
     padding: 0 1.5rem 2.5rem 1.5rem;
+
+    & .media-infos {
+        width: 100%;
+    }
 }
 
 @media screen and (min-width: 768px) {
+    :host::ng-deep .popup {
+        max-height: 700px;
+        height: fit-content;
+    }
+
     .media-details-popup {
         max-height: 700px;
 
-        & .backdrop {
-            height: 25rem;
-        }
+        --height-cover: 35lvh;
+    }
+
+    .media-details-skeleton {
+        height: 700px;
     }
 }

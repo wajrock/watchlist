@@ -1,7 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
 import { FilterService } from '../../../shared/services/filter/filter.service';
@@ -11,7 +10,7 @@ import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/med
 
 @Component({
     selector: 'app-trendings',
-    imports: [CardComponent, MediaPopupDetailsComponent, AvatarComponent],
+    imports: [CardComponent, MediaPopupDetailsComponent],
     templateUrl: './trendings.component.html',
     styleUrl: './trendings.component.scss',
 })

@@ -6,6 +6,7 @@
 
 .page-header {
     gap: 0.25rem;
+    justify-content: center;
 }
 
 .watchlist-infos {
@@ -60,34 +61,10 @@
     position: relative;
 }
 
-.watchlist-views {
-    display: flex;
-    gap: 1rem;
-
-    .watchlist-view {
-        font-size: 1.5rem;
-        font-weight: 500;
-        color: var(--third-text-color);
-        text-transform: capitalize;
-        transition: color 0.4s ease;
-        padding: 0 0.5rem;
-
-        &.active {
-            color: var(--primary-text-color);
-            font-weight: 600;
-        }
-    }
-}
-
 .watchlist-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(10rem, 29vw), 1fr));
     gap: 0.5rem;
-
-    &-item {
-        width: 100%;
-        scroll-snap-align: start;
-    }
 
     &-empty {
         color: var(--secondary-text-color);

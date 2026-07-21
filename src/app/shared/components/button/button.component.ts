@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, input, Input, Output } from '@angular/core';
 
 @Component({
     selector: 'app-button',
@@ -9,6 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ButtonComponent {
     @Input() customClass: string = '';
+    disabled = input<boolean>(false);
 
     @Output() action = new EventEmitter<void>();
 

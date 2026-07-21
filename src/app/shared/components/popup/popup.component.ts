@@ -13,8 +13,8 @@ import {
     signal,
     ViewChild,
 } from '@angular/core';
-import { ButtonComponent } from '../button/button.component';
 import { NavbarService } from '../../services/navbar/navbar.service';
+import { ButtonComponent } from '../button/button.component';
 
 @Component({
     selector: 'app-popup',
@@ -44,15 +44,21 @@ export class PopupComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        if (this.hideNavbarOnClose()) {
-            this.navbarService.hide();
-        } else {
-            this.navbarService.show();
-        }
+        this.restoreNavbarVisibility();
     }
 
     closePopup(): void {
+        this.restoreNavbarVisibility();
         this.close.emit();
+    }
+
+    private restoreNavbarVisibility(): void {
+        if (this.hideNavbarOnClose()) {
+            this.navbarService.hide();
+            return;
+        }
+
+        this.navbarService.show();
     }
 
     onBackgroundClick(event: MouseEvent): void {

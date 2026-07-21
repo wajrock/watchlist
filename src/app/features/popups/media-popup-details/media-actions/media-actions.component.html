@@ -3,11 +3,14 @@
 @let mediaGrade = this.mediaGrade();
 <div class="media-actions">
     @if (view() !== PAGE_VIEW_TYPE.WATCHLIST) {
-        @if (mediaDetails.trailer) {
-            <app-button customClass="btn-default btn-bordered" (action)="openTrailer.emit()">
-                <i class="fa-solid fa-play"></i
-            ></app-button>
-        }
+        <app-button
+            customClass="btn-default btn-bordered"
+            [disabled]="!mediaDetails.trailer"
+            (action)="openTrailer.emit()"
+        >
+            <i class="fa-solid fa-play"></i
+        ></app-button>
+
         <app-button customClass="btn-primary" (action)="add.emit()">
             <i class="fa-solid fa-plus"></i>Ajouter</app-button
         >

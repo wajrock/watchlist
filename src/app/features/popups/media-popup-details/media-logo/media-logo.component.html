@@ -1,8 +1,14 @@
 @let mediaDetails = this.mediaDetails();
-@if (mediaDetails.logo) {
-    <div class="media-logo">
-        <img [src]="`${TMDB_IMG_BASE_URL}/w500${mediaDetails.logo.path}`" alt="" />
-    </div>
-} @else {
-    <h1 class="media-title">{{ mediaDetails.title }}</h1>
-}
+<div class="media-logo">
+    @if (mediaDetails.logo) {
+        <img
+            class="media-logo-image"
+            [src]="`${TMDB_IMG_BASE_URL}/w500${mediaDetails.logo.path}`"
+            alt=""
+        />
+    } @else {
+        <h1 class="media-logo-text">
+            {{ mediaDetails.title }}
+        </h1>
+    }
+</div>

@@ -52,7 +52,7 @@ export function getBestTrailer(videos: VideoObject[]): string | undefined {
         findVideoBy('Trailer', 'fr', false) ||
         ytVideos.find((v) => v.type === 'Trailer')?.key ||
         ytVideos.find((v) => v.official)?.key ||
-        ytVideos[0].key
+        ytVideos[0]?.key
     );
 }
 export function mapSearchToApiMedia(

@@ -3,6 +3,7 @@
     flex-direction: column;
     gap: 0.75rem;
     position: relative;
+    padding-bottom: 7rem;
 }
 
 .search-header {
@@ -29,7 +30,6 @@
     grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
     width: 100%;
     gap: 0.5rem;
-    padding-bottom: 3rem;
 
     &-item {
         scroll-snap-align: start;

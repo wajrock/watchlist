@@ -16,6 +16,10 @@
     transition: background-color 0.3s ease-in-out color 0.3s ease-in-out;
     border-radius: var(--full-radius);
     white-space: nowrap;
+
+    &.disabled {
+        opacity: 0.4;
+    }
 }
 
 .btn-cta {

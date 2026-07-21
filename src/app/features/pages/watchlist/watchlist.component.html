@@ -7,13 +7,12 @@
             @if (lists.length > 0) {
                 <app-button
                     class="watchlists-btn"
-                    customClass="btn-default btn-bordered btn-round"
+                    customClass="btn btn-bordered"
                     (action)="openPopup(POPUP.WATCHLISTS)"
                 >
-                    <i class="fa-solid fa-bars-staggered"></i>
+                    <i class="fa-solid fa-bars-staggered"></i>Mes Watchlists
                 </app-button>
             }
-            <app-avatar class="user-avatar"></app-avatar>
         </header>
 
         @if (lists?.length === 0) {
