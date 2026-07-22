@@ -1,22 +1,20 @@
-import { inject, Injectable, Injector, runInInjectionContext, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { collectionData, docData, Firestore } from '@angular/fire/firestore';
 import {
     collection,
-    collectionData,
     deleteDoc,
     doc,
-    docData,
     documentId,
-    Firestore,
     getDoc,
     query,
     updateDoc,
     where,
-} from '@angular/fire/firestore';
+} from 'firebase/firestore';
 import {
     catchError,
     combineLatest,
-    from,
+    defer,
     map,
     Observable,
     of,
@@ -39,7 +37,6 @@ import { AuthService } from '../auth/auth.service';
 export class WatchlistService {
     private firestore = inject(Firestore);
     private authService = inject(AuthService);
-    private injector = inject(Injector);
 
     private _activeId = signal<string | null>(localStorage.getItem('activeWatchlistId'));
     readonly activeId = this._activeId.asReadonly();
@@ -53,27 +50,25 @@ export class WatchlistService {
             switchMap((user) => {
                 if (!user) return of([]);
 
-                return runInInjectionContext(this.injector, () =>
-                    (
-                        collectionData(collection(this.firestore, 'watchlists'), {
-                            idField: 'uidWatchlist',
-                        }) as Observable<WatchlistItem[]>
-                    ).pipe(
-                        map((lists) =>
-                            lists
-                                .filter((list) =>
-                                    list.members.some(
-                                        (member) =>
-                                            member.id === user.uid && member.invitationAccepted,
-                                    ),
-                                )
-                                .sort((a, b) => {
-                                    return (
-                                        new Date(b.creationTime).getTime() -
-                                        new Date(a.creationTime).getTime()
-                                    );
-                                }),
-                        ),
+                const watchlistsRef = collection(this.firestore, 'watchlists');
+                return (
+                    collectionData(watchlistsRef, {
+                        idField: 'uidWatchlist',
+                    }) as Observable<WatchlistItem[]>
+                ).pipe(
+                    map((lists) =>
+                        lists
+                            .filter((list) =>
+                                list.members.some(
+                                    (member) => member.id === user.uid && member.invitationAccepted,
+                                ),
+                            )
+                            .sort((a, b) => {
+                                return (
+                                    new Date(b.creationTime).getTime() -
+                                    new Date(a.creationTime).getTime()
+                                );
+                            }),
                     ),
                 );
             }),
@@ -84,18 +79,16 @@ export class WatchlistService {
             switchMap((user) => {
                 if (!user) return of([]);
 
-                return runInInjectionContext(this.injector, () =>
-                    (
-                        collectionData(collection(this.firestore, 'watchlists'), {
-                            idField: 'uidWatchlist',
-                        }) as Observable<WatchlistItem[]>
-                    ).pipe(
-                        map((lists) =>
-                            lists.filter((list) =>
-                                list.members.some(
-                                    (member) =>
-                                        member.id === user.uid && !member.invitationAccepted,
-                                ),
+                const watchlistsRef = collection(this.firestore, 'watchlists');
+                return (
+                    collectionData(watchlistsRef, {
+                        idField: 'uidWatchlist',
+                    }) as Observable<WatchlistItem[]>
+                ).pipe(
+                    map((lists) =>
+                        lists.filter((list) =>
+                            list.members.some(
+                                (member) => member.id === user.uid && !member.invitationAccepted,
                             ),
                         ),
                     ),
@@ -112,27 +105,19 @@ export class WatchlistService {
                       }) as Observable<WatchlistItem>)
                     : of(null),
             ),
-
             switchMap((watchlist) => {
                 if (!watchlist) return of(null);
 
                 const userIds = [...new Set(watchlist.members.map((member) => member.id))];
                 const mediaIds = [...new Set(watchlist.medias.map((m) => m.idMedia))];
 
-                return runInInjectionContext(this.injector, () =>
-                    combineLatest([
-                        this.getCollectionByIds<User>('users', 'uid', userIds),
-                        this.getCollectionByIds<ApiMedia>(
-                            'medias',
-                            documentId(),
-                            mediaIds,
-                            'uidMedia',
-                        ),
-                    ]).pipe(
-                        map(([users, medias]) => {
-                            return this.enrichWatchlist(watchlist, users, medias);
-                        }),
-                    ),
+                return combineLatest([
+                    this.getCollectionByIds<User>('users', 'uid', userIds),
+                    this.getCollectionByIds<ApiMedia>('medias', documentId(), mediaIds, 'uidMedia'),
+                ]).pipe(
+                    map(([users, medias]) => {
+                        return this.enrichWatchlist(watchlist, users, medias);
+                    }),
                 );
             }),
             shareReplay(1),
@@ -153,12 +138,10 @@ export class WatchlistService {
             chunks.push(ids.slice(i, i + CHUNK_SIZE));
         }
 
-        const queries$ = chunks.map((chunk) =>
-            runInInjectionContext(this.injector, () => {
-                const q = query(collection(this.firestore, path), where(field, 'in', chunk));
-                return collectionData(q, idField ? { idField } : undefined) as Observable<T[]>;
-            }),
-        );
+        const queries$ = chunks.map((chunk) => {
+            const q = query(collection(this.firestore, path), where(field, 'in', chunk));
+            return collectionData(q, idField ? { idField } : undefined) as Observable<T[]>;
+        });
 
         return combineLatest(queries$).pipe(map((results) => results.flat()));
     }
@@ -193,63 +176,57 @@ export class WatchlistService {
     deleteWatchlist(watchlistId: string): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return runInInjectionContext(this.injector, () =>
-            from(deleteDoc(watchlistRef)).pipe(
-                switchMap(() => this.watchlists$.pipe(take(1))),
-                map((lists) => {
-                    if (this.activeId() === watchlistId) {
-                        if (lists.length > 0) {
-                            this.setActiveId(lists[0].uidWatchlist);
-                        } else {
-                            localStorage.removeItem('activeWatchlistId');
-                            this._activeId.set(null);
-                        }
+        return defer(() => deleteDoc(watchlistRef)).pipe(
+            switchMap(() => this.watchlists$.pipe(take(1))),
+            map((lists) => {
+                if (this.activeId() === watchlistId) {
+                    if (lists.length > 0) {
+                        this.setActiveId(lists[0].uidWatchlist);
+                    } else {
+                        localStorage.removeItem('activeWatchlistId');
+                        this._activeId.set(null);
                     }
-                    return true;
-                }),
-                catchError((err) => {
-                    console.error('Erreur lors de la suppression:', err);
-                    return of(false);
-                }),
-            ),
+                }
+                return true;
+            }),
+            catchError((err) => {
+                console.error('Erreur lors de la suppression:', err);
+                return of(false);
+            }),
         );
     }
 
     removeMember(watchlistId: string, memberId: string): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return runInInjectionContext(this.injector, () =>
-            from(getDoc(watchlistRef)).pipe(
-                switchMap((snapshot) => {
-                    const data = snapshot.data() as WatchlistItem;
-                    if (!snapshot.exists() || !data.medias) return of(false);
+        return defer(() => getDoc(watchlistRef)).pipe(
+            switchMap((snapshot) => {
+                const data = snapshot.data() as WatchlistItem;
+                if (!snapshot.exists() || !data.medias) return of(false);
 
-                    const members = data.members.filter((member) => member.id !== memberId);
+                const members = data.members.filter((member) => member.id !== memberId);
 
-                    return from(updateDoc(watchlistRef, { members })).pipe(map(() => true));
-                }),
-                catchError(() => of(false)),
-            ),
+                return defer(() => updateDoc(watchlistRef, { members })).pipe(map(() => true));
+            }),
+            catchError(() => of(false)),
         );
     }
 
     addNewMembers(watchlistId: string, members: Member[]): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return runInInjectionContext(this.injector, () =>
-            from(getDoc(watchlistRef)).pipe(
-                switchMap((snapshot) => {
-                    const data = snapshot.data() as WatchlistItem;
-                    if (!snapshot.exists() || !data.medias) return of(false);
+        return defer(() => getDoc(watchlistRef)).pipe(
+            switchMap((snapshot) => {
+                const data = snapshot.data() as WatchlistItem;
+                if (!snapshot.exists() || !data.medias) return of(false);
 
-                    const newMembers = [...data.members, ...members];
+                const newMembers = [...data.members, ...members];
 
-                    return from(updateDoc(watchlistRef, { members: newMembers })).pipe(
-                        map(() => true),
-                    );
-                }),
-                catchError(() => of(false)),
-            ),
+                return defer(() => updateDoc(watchlistRef, { members: newMembers })).pipe(
+                    map(() => true),
+                );
+            }),
+            catchError(() => of(false)),
         );
     }
 }

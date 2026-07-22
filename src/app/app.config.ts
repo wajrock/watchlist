@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
         provideFirebaseApp(() => initializeApp(environment.firebase)),
         provideFunctions(() => getFunctions()),
         provideFirestore(() => {
-            return initializeFirestore(getApp(), { localCache: persistentLocalCache() });
+            return initializeFirestore(getApp(), {});
         }),
         provideAuth(() => getAuth()),
         provideAnimationsAsync(),

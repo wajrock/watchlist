@@ -81,7 +81,7 @@ describe('MediaPopupDetailsComponent', () => {
         mockToastService = { show: vi.fn() };
 
         await TestBed.configureTestingModule({
-            imports: [MediaPopupDetailsMockComponent], // Placé ici pour satisfaire les contraintes du moteur Standalone
+            imports: [MediaPopupDetailsMockComponent],
             providers: [
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: TmdbService, useValue: mockTmdbService },

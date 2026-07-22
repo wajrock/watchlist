@@ -1,24 +1,23 @@
-import { EnvironmentInjector, inject, Injectable, runInInjectionContext } from '@angular/core';
+import { inject, Injectable, EnvironmentInjector, runInInjectionContext } from '@angular/core';
+import { Auth, authState } from '@angular/fire/auth';
+import { Firestore, docData } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
 import {
-    Auth,
-    authState,
+    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
     updateProfile,
-} from '@angular/fire/auth';
+} from 'firebase/auth';
 import {
     collection,
-    docData,
-    Firestore,
+    doc,
+    enableNetwork,
     getDocs,
     limit,
     query,
     setDoc,
     where,
-} from '@angular/fire/firestore';
-import { Router } from '@angular/router';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc } from 'firebase/firestore';
+} from 'firebase/firestore';
 import { Observable, of, shareReplay, switchMap } from 'rxjs';
 import { User } from '../../models/firebase.models';
 
@@ -49,34 +48,37 @@ export class AuthService {
     async checkUserExists(username: string): Promise<boolean> {
         if (!username) return false;
 
-        const usersRef = collection(this.firestore, 'users');
-        const q = query(usersRef, where('username', '==', username), limit(1));
-        const querySnapshot = await runInInjectionContext(this.injector, () => getDocs(q));
-
-        return !querySnapshot.empty;
-    }
-
-    async signUp(username: string, password: string, name: string) {
         try {
-            const technicalEmail = `${username}${this.AUTH_DOMAIN}`;
+            await enableNetwork(this.firestore);
 
-            const userCredential = await createUserWithEmailAndPassword(
-                this.auth,
-                technicalEmail,
-                password,
-            );
-            const user = userCredential.user;
+            const usersRef = collection(this.firestore, 'users');
+            const q = query(usersRef, where('username', '==', username), limit(1));
+            const querySnapshot = await getDocs(q);
 
-            await updateProfile(user, { displayName: name });
-
-            await setDoc(doc(this.firestore, `users/${user.uid}`), {
-                uid: user.uid,
-                username: username,
-                name: name,
-            });
+            return !querySnapshot.empty;
         } catch (error) {
+            console.error('checkUserExists error:', error);
             throw error;
         }
+    }
+
+    async signUp(username: string, password: string, name: string): Promise<void> {
+        const technicalEmail = `${username}${this.AUTH_DOMAIN}`;
+
+        const userCredential = await createUserWithEmailAndPassword(
+            this.auth,
+            technicalEmail,
+            password,
+        );
+        const user = userCredential.user;
+
+        await updateProfile(user, { displayName: name });
+
+        await setDoc(doc(this.firestore, `users/${user.uid}`), {
+            uid: user.uid,
+            username: username,
+            name: name,
+        });
     }
 
     async login(username: string, password: string): Promise<void> {

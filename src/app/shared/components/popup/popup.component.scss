@@ -12,24 +12,22 @@
 
 .popup {
     width: 100%;
-    max-width: 28rem;
     height: 100%;
     background-color: var(--bg-color);
-    border-radius: 3rem;
     position: relative;
     overflow: hidden;
     display: flex;
     padding-top: calc(env(safe-area-inset-top) + 0.5rem);
 
     &.animate {
-        animation: zoomIn 0.5s ease;
+        animation: fadeIn 0.5s ease;
     }
 
     &-close {
         position: absolute;
         z-index: 1;
         right: 1rem;
-        top: env(safe-area-inset-top);
+        top: max(1rem, env(safe-area-inset-top));
 
         &::ng-deep .button {
             width: 2.25rem !important;
@@ -61,6 +59,7 @@
         justify-content: center;
     }
     .popup {
+        max-width: 35rem;
         border-radius: 2rem;
         height: fit-content;
         border: 0.075rem solid var(--border-color);
@@ -71,11 +70,5 @@
         &-close {
             top: 1rem;
         }
-    }
-}
-
-@media screen and (min-width: 1024px) {
-    .popup {
-        max-width: 35rem;
     }
 }

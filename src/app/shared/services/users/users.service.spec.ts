@@ -1,19 +1,29 @@
 import { TestBed } from '@angular/core/testing';
 import { Firestore } from '@angular/fire/firestore';
-import { of, firstValueFrom, Observable } from 'rxjs';
-import { UsersService } from './users.service';
+import { firstValueFrom, Observable, of } from 'rxjs';
 import { User } from '../../models/firebase.models';
+import { UsersService } from './users.service';
 
 let mockCollectionDataObservable: Observable<any> = of([]);
+let mockDocDataObservable: Observable<any> = of(undefined);
 let mockAddDocPromise: Promise<any> = Promise.resolve({ id: 'new-user-id' });
+
+vi.mock('firebase/firestore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('firebase/firestore')>();
+    return {
+        ...actual,
+        collection: vi.fn(),
+        doc: vi.fn(),
+        addDoc: vi.fn(() => mockAddDocPromise),
+    };
+});
 
 vi.mock('@angular/fire/firestore', async (importOriginal) => {
     const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
     return {
         ...actual,
-        collection: vi.fn(),
         collectionData: vi.fn(() => mockCollectionDataObservable),
-        addDoc: vi.fn(() => mockAddDocPromise),
+        docData: vi.fn(() => mockDocDataObservable),
     };
 });
 
@@ -33,6 +43,7 @@ describe('UsersService', () => {
         service = TestBed.inject(UsersService);
 
         mockCollectionDataObservable = of([]);
+        mockDocDataObservable = of(undefined);
         mockAddDocPromise = Promise.resolve({ id: 'new-user-id' });
     });
 
@@ -80,18 +91,15 @@ describe('UsersService', () => {
 
     describe('getUser', () => {
         it('should locate the correct matching object reference given a user ID criteria', async () => {
-            const mockUsers = [
-                { uid: '1', username: 'alice', name: 'Alice' },
-                { uid: '2', username: 'bob', name: 'Bob' },
-            ] as User[];
-            mockCollectionDataObservable = of(mockUsers);
+            const mockUser = { uid: '2', username: 'bob', name: 'Bob' } as User;
+            mockDocDataObservable = of(mockUser);
 
             const result = await firstValueFrom(service.getUser('2'));
             expect(result).toEqual({ uid: '2', username: 'bob', name: 'Bob' });
         });
 
         it('should return undefined if no matching object reference can be found', async () => {
-            mockCollectionDataObservable = of([]);
+            mockDocDataObservable = of(undefined);
             const result = await firstValueFrom(service.getUser('999'));
             expect(result).toBeUndefined();
         });

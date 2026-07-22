@@ -188,7 +188,6 @@ describe('WatchlistComponent', () => {
             });
         });
 
-        // ADD_MEMBERS has a special side effect on close, tested separately below
         popupMapping
             .filter((p) => p.type !== POPUP.ADD_MEMBERS)
             .forEach(({ type, signalName }) => {

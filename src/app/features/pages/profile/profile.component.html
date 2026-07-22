@@ -49,12 +49,7 @@
             <h2 class="profile-section-title">Historique</h2>
 
             <div class="history-tags">
-                @let movieMediasCount = this.movieMediasCount();
-                @let seriesMediasCount = this.seriesMediasCount();
-                @let likeMediasCount = this.likeMediasCount();
-                @let loveMediasCount = this.loveMediasCount();
-
-                @if (movieMediasCount && movieMediasCount > 0) {
+                @if (this.movieMediasCount() > 0) {
                     <div
                         class="history-tag"
                         [class.active]="historyFilter() === CONTENT_TYPE.MOVIE"
@@ -64,7 +59,7 @@
                     </div>
                 }
 
-                @if (seriesMediasCount && seriesMediasCount > 0) {
+                @if (this.seriesMediasCount() > 0) {
                     <div
                         class="history-tag"
                         [class.active]="historyFilter() === CONTENT_TYPE.TV"
@@ -75,7 +70,17 @@
                     </div>
                 }
 
-                @if (likeMediasCount && likeMediasCount > 0) {
+                @if (this.loveMediasCount() > 0) {
+                    <div
+                        class="history-tag"
+                        [class.active]="historyFilter() === GRADE.LOVE"
+                        (click)="historyFilter.set(GRADE.LOVE)"
+                    >
+                        <i class="fa-regular fa-heart"></i>
+                    </div>
+                }
+
+                @if (this.likeMediasCount() > 0) {
                     <div
                         class="history-tag"
                         [class.active]="historyFilter() === GRADE.LIKE"
@@ -85,13 +90,13 @@
                     </div>
                 }
 
-                @if (loveMediasCount && loveMediasCount > 0) {
+                @if (this.notLikeMediasCount() > 0) {
                     <div
                         class="history-tag"
-                        [class.active]="historyFilter() === GRADE.LOVE"
-                        (click)="historyFilter.set(GRADE.LOVE)"
+                        [class.active]="historyFilter() === GRADE.DONT_LIKE"
+                        (click)="historyFilter.set(GRADE.DONT_LIKE)"
                     >
-                        <i class="fa-regular fa-heart"></i>
+                        <i class="fa-regular fa-thumbs-down"></i>
                     </div>
                 }
             </div>

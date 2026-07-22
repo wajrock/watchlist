@@ -67,7 +67,7 @@ describe('PopupComponent', () => {
         component.closePopup();
 
         expect(emitSpy).toHaveBeenCalled();
-        expect(mockNavbarService.hide).toHaveBeenCalledTimes(2); // once on init, once on close
+        expect(mockNavbarService.hide).toHaveBeenCalledTimes(2);
     });
 
     it('should trigger closePopup on background click when target is the overlay', () => {

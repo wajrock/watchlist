@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { Firestore } from '@angular/fire/firestore';
-import { BehaviorSubject, of, firstValueFrom } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, of } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { WatchlistService } from './watchlist.service';
+import { Member, WatchlistItem } from '../../models/firebase.models';
 import { AuthService } from '../auth/auth.service';
-import { WatchlistItem, Member } from '../../models/firebase.models';
+import { WatchlistService } from './watchlist.service';
 
 const mockCollectionData$ = new BehaviorSubject<any[]>([]);
 const mockDocData$ = new BehaviorSubject<any>(null);
@@ -12,8 +12,8 @@ const mockGetDocPromise = vi.fn();
 const mockDeleteDocPromise = vi.fn();
 const mockUpdateDocPromise = vi.fn();
 
-vi.mock('@angular/fire/firestore', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
+vi.mock('firebase/firestore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('firebase/firestore')>();
     return {
         ...actual,
         collection: vi.fn(),
@@ -21,11 +21,18 @@ vi.mock('@angular/fire/firestore', async (importOriginal) => {
         query: vi.fn(),
         where: vi.fn(),
         documentId: vi.fn(() => 'documentId'),
-        collectionData: vi.fn(() => mockCollectionData$.asObservable()),
-        docData: vi.fn(() => mockDocData$.asObservable()),
         getDoc: vi.fn((...args) => mockGetDocPromise(...args)),
         deleteDoc: vi.fn((...args) => mockDeleteDocPromise(...args)),
         updateDoc: vi.fn((...args) => mockUpdateDocPromise(...args)),
+    };
+});
+
+vi.mock('@angular/fire/firestore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
+    return {
+        ...actual,
+        collectionData: vi.fn(() => mockCollectionData$.asObservable()),
+        docData: vi.fn(() => mockDocData$.asObservable()),
     };
 });
 
@@ -173,17 +180,15 @@ describe('WatchlistService', () => {
 
     describe('deleteWatchlist', () => {
         it('should fallback clean active signal indices if target deletion is matching currently selected list', async () => {
-            vi.spyOn(service, 'watchlists$', 'get').mockReturnValue(
-                of([
-                    {
-                        uidWatchlist: 'w-456',
-                        creationTime: '2026-01-01',
-                        members: [],
-                        name: 'Mock List',
-                        medias: [],
-                    } as WatchlistItem,
-                ]),
-            );
+            service.watchlists$ = of([
+                {
+                    uidWatchlist: 'w-456',
+                    creationTime: '2026-01-01',
+                    members: [],
+                    name: 'Mock List',
+                    medias: [],
+                } as WatchlistItem,
+            ]);
 
             const result = await firstValueFrom(service.deleteWatchlist('w-123').pipe(take(1)));
             expect(result).toBe(true);
@@ -191,7 +196,7 @@ describe('WatchlistService', () => {
         });
 
         it('should clear structural indicators if no alternative options remain available post-delete actions', async () => {
-            vi.spyOn(service, 'watchlists$', 'get').mockReturnValue(of([]));
+            service.watchlists$ = of([]);
 
             const result = await firstValueFrom(service.deleteWatchlist('w-123').pipe(take(1)));
             expect(result).toBe(true);

@@ -1,41 +1,23 @@
-import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
 import { EnvironmentInjector } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, signOut, updateProfile } from '@angular/fire/auth';
-import { Firestore, setDoc, docData } from '@angular/fire/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { Subject, firstValueFrom } from 'rxjs';
+import { TestBed } from '@angular/core/testing';
+import { Auth, authState } from '@angular/fire/auth';
+import { docData, Firestore } from '@angular/fire/firestore';
+import { Router } from '@angular/router';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile,
+} from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+
+import { firstValueFrom, Subject } from 'rxjs';
 import { AuthService } from './auth.service';
 
 const mockAuthStateSubject = new Subject<any>();
 const mockFirestoreState = {
     querySnapshotEmpty: true,
 };
-
-vi.mock('@angular/fire/auth', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@angular/fire/auth')>();
-    return {
-        ...actual,
-        authState: () => mockAuthStateSubject.asObservable(),
-        signInWithEmailAndPassword: vi.fn(),
-        signOut: vi.fn(),
-        updateProfile: vi.fn(),
-    };
-});
-
-vi.mock('@angular/fire/firestore', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
-    return {
-        ...actual,
-        collection: vi.fn(),
-        query: vi.fn(),
-        where: vi.fn(),
-        limit: vi.fn(),
-        setDoc: vi.fn(),
-        getDocs: vi.fn(() => Promise.resolve({ empty: mockFirestoreState.querySnapshotEmpty })),
-        docData: vi.fn(() => new Subject().asObservable()),
-    };
-});
 
 vi.mock('firebase/auth', async (importOriginal) => {
     const actual = await importOriginal<typeof import('firebase/auth')>();
@@ -44,6 +26,9 @@ vi.mock('firebase/auth', async (importOriginal) => {
         createUserWithEmailAndPassword: vi.fn().mockResolvedValue({
             user: { uid: 'new-user-123' },
         }),
+        signInWithEmailAndPassword: vi.fn().mockResolvedValue({}),
+        signOut: vi.fn().mockResolvedValue(undefined),
+        updateProfile: vi.fn().mockResolvedValue(undefined),
     };
 });
 
@@ -51,7 +36,30 @@ vi.mock('firebase/firestore', async (importOriginal) => {
     const actual = await importOriginal<typeof import('firebase/firestore')>();
     return {
         ...actual,
+        collection: vi.fn(),
         doc: vi.fn(),
+        query: vi.fn(),
+        where: vi.fn(),
+        limit: vi.fn(),
+        enableNetwork: vi.fn().mockResolvedValue(undefined),
+        setDoc: vi.fn().mockResolvedValue(undefined),
+        getDocs: vi.fn(() => Promise.resolve({ empty: mockFirestoreState.querySnapshotEmpty })),
+    };
+});
+
+vi.mock('@angular/fire/auth', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@angular/fire/auth')>();
+    return {
+        ...actual,
+        authState: () => mockAuthStateSubject.asObservable(),
+    };
+});
+
+vi.mock('@angular/fire/firestore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
+    return {
+        ...actual,
+        docData: vi.fn(() => new Subject().asObservable()),
     };
 });
 

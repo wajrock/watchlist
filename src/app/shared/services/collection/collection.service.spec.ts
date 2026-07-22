@@ -10,8 +10,8 @@ let mockGetDocPromise = Promise.resolve({ exists: () => false, data: () => ({}) 
 let mockAddDocPromise = Promise.resolve({ id: 'new-doc-id' });
 let mockUpdateDocPromise = Promise.resolve();
 
-vi.mock('@angular/fire/firestore', async (importOriginal) => {
-    const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
+vi.mock('firebase/firestore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('firebase/firestore')>();
     return {
         ...actual,
         collection: vi.fn(),
@@ -19,11 +19,18 @@ vi.mock('@angular/fire/firestore', async (importOriginal) => {
         query: vi.fn(),
         where: vi.fn(),
         arrayUnion: vi.fn((val) => val),
-        collectionData: vi.fn(() => mockCollectionDataObservable),
         addDoc: vi.fn(() => mockAddDocPromise),
         getDocs: vi.fn(() => mockGetDocsPromise),
         getDoc: vi.fn(() => mockGetDocPromise),
         updateDoc: vi.fn(() => mockUpdateDocPromise),
+    };
+});
+
+vi.mock('@angular/fire/firestore', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@angular/fire/firestore')>();
+    return {
+        ...actual,
+        collectionData: vi.fn(() => mockCollectionDataObservable),
     };
 });
 

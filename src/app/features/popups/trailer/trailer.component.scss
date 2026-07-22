@@ -20,7 +20,7 @@
 .popup-close {
     position: absolute;
     right: 1rem;
-    top: env(safe-area-inset-top);
+    top: max(1rem, env(safe-area-inset-top));
 
     &::ng-deep .button {
         width: 2.25rem !important;

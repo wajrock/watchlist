@@ -1,18 +1,17 @@
-import { inject, Injectable, EnvironmentInjector, runInInjectionContext } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { collectionData, Firestore } from '@angular/fire/firestore';
 import {
     addDoc,
     arrayUnion,
     collection,
-    collectionData,
     doc,
-    Firestore,
     getDoc,
     getDocs,
     query,
     updateDoc,
     where,
-} from '@angular/fire/firestore';
-import { catchError, from, map, Observable, of, switchMap } from 'rxjs';
+} from 'firebase/firestore';
+import { catchError, defer, map, Observable, of, switchMap } from 'rxjs';
 import {
     ApiMedia,
     GRADE,
@@ -27,7 +26,6 @@ import {
 })
 export class CollectionService {
     private firestore = inject(Firestore);
-    private injector = inject(EnvironmentInjector);
 
     getWatchlists(userId: string): Observable<WatchlistItem[]> {
         const watchlistsRef = collection(this.firestore, 'watchlists');
@@ -36,14 +34,17 @@ export class CollectionService {
     }
 
     addWatchlist(watchlistName: string, members: Member[]): Observable<WatchlistItem> {
-        const watchlistsRef = collection(this.firestore, 'watchlists');
         const watchlist = {
             name: watchlistName,
             creationTime: new Date().toISOString(),
             members: members,
             medias: [],
         };
-        return from(addDoc(watchlistsRef, watchlist)).pipe(
+
+        return defer(() => {
+            const watchlistsRef = collection(this.firestore, 'watchlists');
+            return addDoc(watchlistsRef, watchlist);
+        }).pipe(
             map((docRef) => ({
                 uidWatchlist: docRef.id,
                 creationTime: watchlist.creationTime,
@@ -55,11 +56,11 @@ export class CollectionService {
     }
 
     checkIfMediaAlreadyInDB(apiId: number, mediaType: string): Observable<string | null> {
-        const filmsRef = collection(this.firestore, 'medias');
-
-        const q = query(filmsRef, where('apiId', '==', apiId), where('type', '==', mediaType));
-
-        return from(runInInjectionContext(this.injector, () => getDocs(q))).pipe(
+        return defer(() => {
+            const filmsRef = collection(this.firestore, 'medias');
+            const q = query(filmsRef, where('apiId', '==', apiId), where('type', '==', mediaType));
+            return getDocs(q);
+        }).pipe(
             map((snapshot) => {
                 if (snapshot.docs.length > 0) {
                     return snapshot.docs[0].id;
@@ -74,22 +75,22 @@ export class CollectionService {
         apiMedia: ApiMedia,
         mediaWatchlistInfos: WatchlistMediaAdd,
     ): Observable<boolean> {
-        const mediasRef = collection(this.firestore, 'medias');
-        const watchlistDocRef = doc(this.firestore, `watchlists/${watchlistId}`);
-
         return this.checkIfMediaAlreadyInDB(apiMedia.id, apiMedia.type).pipe(
             switchMap((mediaIdFromCollection) => {
                 if (mediaIdFromCollection) {
                     return this.updateWatchlistArray(
-                        watchlistDocRef,
+                        watchlistId,
                         mediaIdFromCollection,
                         mediaWatchlistInfos,
                     );
                 } else {
-                    return from(addDoc(mediasRef, apiMedia)).pipe(
+                    return defer(() => {
+                        const mediasRef = collection(this.firestore, 'medias');
+                        return addDoc(mediasRef, apiMedia);
+                    }).pipe(
                         switchMap((newMediaRef) => {
                             return this.updateWatchlistArray(
-                                watchlistDocRef,
+                                watchlistId,
                                 newMediaRef.id,
                                 mediaWatchlistInfos,
                             );
@@ -106,7 +107,7 @@ export class CollectionService {
     }
 
     private updateWatchlistArray(
-        watchlistRef: any,
+        watchlistId: string,
         mediaId: string,
         infos: WatchlistMediaAdd,
     ): Observable<void> {
@@ -115,11 +116,12 @@ export class CollectionService {
             ...infos,
         };
 
-        return from(
-            updateDoc(watchlistRef, {
+        return defer(() => {
+            const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
+            return updateDoc(watchlistRef, {
                 medias: arrayUnion(newEntry),
-            }),
-        );
+            });
+        });
     }
 
     updateMediaSeenStatus(
@@ -129,7 +131,7 @@ export class CollectionService {
     ): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
+        return defer(() => getDoc(watchlistRef)).pipe(
             switchMap((snapshot) => {
                 const data = snapshot.data() as WatchlistItem;
                 if (!snapshot.exists() || !data.medias) return of(false);
@@ -138,7 +140,7 @@ export class CollectionService {
                     m.idMedia === idMedia ? { ...m, isSeen } : m,
                 );
 
-                return from(updateDoc(watchlistRef, { medias })).pipe(map(() => true));
+                return defer(() => updateDoc(watchlistRef, { medias })).pipe(map(() => true));
             }),
             catchError(() => of(false)),
         );
@@ -147,7 +149,7 @@ export class CollectionService {
     updateMediaGrade(watchlistId: string, idMedia: string, grade: GRADE): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
+        return defer(() => getDoc(watchlistRef)).pipe(
             switchMap((snapshot) => {
                 const data = snapshot.data() as WatchlistItem;
                 if (!snapshot.exists() || !data.medias) return of(false);
@@ -156,7 +158,7 @@ export class CollectionService {
                     m.idMedia === idMedia ? { ...m, grade: grade } : m,
                 );
 
-                return from(updateDoc(watchlistRef, { medias })).pipe(map(() => true));
+                return defer(() => updateDoc(watchlistRef, { medias })).pipe(map(() => true));
             }),
             catchError(() => of(false)),
         );
@@ -169,7 +171,7 @@ export class CollectionService {
     ): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
+        return defer(() => getDoc(watchlistRef)).pipe(
             switchMap((snapshot) => {
                 const data = snapshot.data() as WatchlistItem;
                 if (!snapshot.exists() || !data.medias) return of(false);
@@ -184,7 +186,7 @@ export class CollectionService {
                     members = data.members.filter((m) => m.id !== idMember);
                 }
 
-                return from(updateDoc(watchlistRef, { members })).pipe(map(() => true));
+                return defer(() => updateDoc(watchlistRef, { members })).pipe(map(() => true));
             }),
             catchError(() => of(false)),
         );
@@ -193,7 +195,7 @@ export class CollectionService {
     removeMediaFromWatchlist(watchlistId: string, idMedia: string): Observable<boolean> {
         const watchlistRef = doc(this.firestore, `watchlists/${watchlistId}`);
 
-        return from(runInInjectionContext(this.injector, () => getDoc(watchlistRef))).pipe(
+        return defer(() => getDoc(watchlistRef)).pipe(
             switchMap((snapshot) => {
                 if (!snapshot.exists()) return of(false);
 
@@ -202,7 +204,7 @@ export class CollectionService {
 
                 const updatedMedias = medias.filter((m) => m.idMedia !== idMedia);
 
-                return from(updateDoc(watchlistRef, { medias: updatedMedias })).pipe(
+                return defer(() => updateDoc(watchlistRef, { medias: updatedMedias })).pipe(
                     map(() => true),
                 );
             }),

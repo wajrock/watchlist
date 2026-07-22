@@ -97,11 +97,11 @@ describe('SearchComponent', () => {
         });
 
         it('should deactivate magic search and show navbar', () => {
-            component.switchSearchType(); // activate
+            component.switchSearchType();
             mockNavbarService.hide.mockClear();
             mockNavbarService.show.mockClear();
 
-            component.switchSearchType(); // deactivate
+            component.switchSearchType();
 
             expect(component.isMagicSearchActivated()).toBe(false);
             expect(mockNavbarService.show).toHaveBeenCalled();

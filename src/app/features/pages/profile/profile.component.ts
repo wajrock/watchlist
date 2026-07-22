@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { documentId } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
+import { documentId } from 'firebase/firestore';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
@@ -59,26 +59,31 @@ export class ProfileComponent {
                         const enrichedLists = watchlists.map((watchlist) =>
                             this.watchlistService.enrichWatchlist(watchlist, users, mediasData),
                         );
-                        const allEnrichedMedias = enrichedLists.flatMap((w) => w.medias);
-
-                        return allEnrichedMedias;
+                        return enrichedLists.flatMap((w) => w.medias);
                     }),
                 );
             }),
         ),
     );
+
     movieMediasCount = computed(
         () =>
-            this.medias()?.filter((media) => media.mediaDetails.type === CONTENT_TYPE.MOVIE).length,
+            this.medias()?.filter((media) => media.mediaDetails.type === CONTENT_TYPE.MOVIE)
+                .length ?? 0,
     );
     seriesMediasCount = computed(
-        () => this.medias()?.filter((media) => media.mediaDetails.type === CONTENT_TYPE.TV).length,
+        () =>
+            this.medias()?.filter((media) => media.mediaDetails.type === CONTENT_TYPE.TV).length ??
+            0,
     );
     likeMediasCount = computed(
-        () => this.medias()?.filter((media) => media.grade === GRADE.LIKE).length,
+        () => this.medias()?.filter((media) => media.grade === GRADE.LIKE).length ?? 0,
     );
     loveMediasCount = computed(
-        () => this.medias()?.filter((media) => media.grade === GRADE.LOVE).length,
+        () => this.medias()?.filter((media) => media.grade === GRADE.LOVE).length ?? 0,
+    );
+    notLikeMediasCount = computed(
+        () => this.medias()?.filter((media) => media.grade === GRADE.DONT_LIKE).length ?? 0,
     );
 
     view = signal<PROFILE_SECTION_VIEW | null>(null);
@@ -103,15 +108,11 @@ export class ProfileComponent {
 
         if (!allMedias) return [];
 
-        let filteredMedias: EnrichedMedia[];
-
         if (filter === CONTENT_TYPE.MOVIE || filter === CONTENT_TYPE.TV) {
-            filteredMedias = allMedias?.filter((media) => media.mediaDetails.type === filter);
+            return allMedias.filter((media) => media.mediaDetails.type === filter);
         } else {
-            filteredMedias = allMedias?.filter((media) => media.grade === filter);
+            return allMedias.filter((media) => media.grade === filter);
         }
-
-        return filteredMedias;
     });
 
     goBack(): void {
@@ -119,8 +120,10 @@ export class ProfileComponent {
     }
 
     async logOut() {
-        await this.authService.logout();
-        this.router.navigate(['/welcome'], { replaceUrl: true });
+        const navigated = await this.router.navigate(['/welcome'], { replaceUrl: true });
+        if (navigated) {
+            await this.authService.logout();
+        }
     }
 
     handleInvitation(watchlistId: string, joinWatchlist: boolean) {
@@ -133,24 +136,16 @@ export class ProfileComponent {
             .updateMemberInvitation(watchlistId, user.uid, joinWatchlist)
             .subscribe((response) => {
                 if (response) {
-                    if (joinWatchlist) {
-                        this.toastService.show({
-                            type: TOAST_TYPE.SUCCESS,
-                            message: 'Invitation acceptée',
-                        });
-                    } else {
-                        this.toastService.show({
-                            type: TOAST_TYPE.SUCCESS,
-                            message: 'Invitation refusée',
-                        });
-                    }
+                    this.toastService.show({
+                        type: TOAST_TYPE.SUCCESS,
+                        message: joinWatchlist ? 'Invitation acceptée' : 'Invitation refusée',
+                    });
                 } else {
                     this.toastService.show({
                         type: TOAST_TYPE.ERROR,
                         message: 'Un problème est survenu',
                     });
                 }
-                return;
             });
     }
 }
