@@ -25,7 +25,7 @@
                 <div class="card-skeleton"></div>
             }
         } @else {
-            @for (item of trendingsResource.value(); track item.id) {
+            @for (item of trendingMedias(); track item.id) {
                 @if (item.posterPath) {
                     <app-card
                         [posterPath]="item.posterPath"

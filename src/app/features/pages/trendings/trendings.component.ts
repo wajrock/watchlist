@@ -1,5 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, signal } from '@angular/core';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { CardComponent } from '../../../shared/components/card/card.component';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
@@ -7,6 +7,7 @@ import { FilterService } from '../../../shared/services/filter/filter.service';
 import { TmdbService } from '../../../shared/services/tmdb/tmdb.service';
 import { mapDetailsToApiMedia } from '../../../shared/utils/media.utils';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 
 @Component({
     selector: 'app-trendings',
@@ -23,10 +24,12 @@ export class TrendingsComponent {
     // INJECTS
     private tmdbService = inject(TmdbService);
     protected filterService = inject(FilterService);
+    private watchlistService = inject(WatchlistService);
 
     // SIGNALS
     selectedInfo = signal<CardInfo | null>(null);
     showDetailsPopup = signal<boolean>(false);
+    activeWatchlist = toSignal(this.watchlistService.activeWatchlist$);
 
     // RESOURCE
     trendingsResource = rxResource({
@@ -39,6 +42,18 @@ export class TrendingsComponent {
                     }),
                 ),
             ),
+    });
+
+    trendingMedias = computed(() => {
+        if (!this.trendingsResource.value()) return [];
+        return this.trendingsResource
+            .value()
+            ?.filter(
+                (item) =>
+                    !this.activeWatchlist()?.medias.some(
+                        (media) => media.mediaDetails.id === item.id,
+                    ),
+            );
     });
 
     // METHODS
