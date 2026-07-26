@@ -1,5 +1,4 @@
 .new-watchlist {
-    height: 50lvh;
     width: 100%;
     padding: 2.5rem 1rem 2rem;
     display: flex;
@@ -22,6 +21,7 @@
     position: relative;
     align-items: center;
     margin-top: 0.5rem;
+    height: 100%;
 }
 
 .new-watchlist-title {

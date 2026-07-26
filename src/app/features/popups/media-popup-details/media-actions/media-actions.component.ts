@@ -1,13 +1,38 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, computed, input, output } from '@angular/core';
+import {
+    LucideCirclePlus,
+    LucideCircleX,
+    LucideDynamicIcon,
+    LucideEye,
+    LucideEyeOff,
+    LucideHeart,
+    LucidePlay,
+    LucideThumbsDown,
+    LucideThumbsUp,
+    LucideTrash,
+} from '@lucide/angular';
 import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { ApiMedia, GRADE } from '../../../../shared/models/firebase.models';
 import { ACTIONS_VIEW, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../../shared/models/models';
 
 @Component({
     selector: 'app-media-actions',
-    imports: [ButtonComponent, CommonModule],
+    imports: [
+        ButtonComponent,
+        CommonModule,
+        LucidePlay,
+        LucideCirclePlus,
+        LucideEye,
+        LucideEyeOff,
+        LucideDynamicIcon,
+        LucideCircleX,
+        LucideThumbsDown,
+        LucideThumbsUp,
+        LucideHeart,
+        LucideTrash,
+    ],
     templateUrl: './media-actions.component.html',
     styleUrl: './media-actions.component.scss',
     animations: [
@@ -48,19 +73,19 @@ export class MediaActionsComponent {
     updateGrade = output<GRADE>();
     changeActionsView = output<ACTIONS_VIEW>();
 
-    gradesBtnContent = computed<{ icon: string; text: string }>(() => {
+    gradesBtnContent = computed<{ icon: any; text: string }>(() => {
         const mediaGrade = this.mediaGrade();
         const mediaDetails = this.mediaDetails();
 
         if (mediaGrade === GRADE.LOVE) {
-            return { icon: 'fa-heart', text: "J'adore" };
+            return { icon: LucideHeart, text: "J'adore" };
         } else if (mediaGrade === GRADE.LIKE) {
-            return { icon: 'fa-thumbs-up', text: "J'aime" };
+            return { icon: LucideThumbsUp, text: "J'aime" };
         } else if (mediaGrade === GRADE.DONT_LIKE) {
-            return { icon: 'fa-thumbs-down', text: "J'aime pas" };
+            return { icon: LucideThumbsDown, text: "J'aime pas" };
         }
         return {
-            icon: 'fa-thumbs-up',
+            icon: LucideThumbsUp,
             text: `Noter ${mediaDetails.type === CONTENT_TYPE.MOVIE ? 'ce film' : 'cette série'}`,
         };
     });

@@ -1,4 +1,5 @@
 import { Component, inject, input, output } from '@angular/core';
+import { LucideTrash, LucideUsersRound } from '@lucide/angular';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { PopupComponent } from '../../../shared/components/popup/popup.component';
 import { EnrichedWatchlist } from '../../../shared/models/firebase.models';
@@ -8,7 +9,7 @@ import { WatchlistService } from '../../../shared/services/watchlist/watchlist.s
 
 @Component({
     selector: 'app-members-popup',
-    imports: [PopupComponent, ButtonComponent],
+    imports: [PopupComponent, ButtonComponent, LucideTrash, LucideUsersRound],
     templateUrl: './members-popup.component.html',
     styleUrl: './members-popup.component.scss',
 })

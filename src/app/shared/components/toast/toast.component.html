@@ -1,8 +1,8 @@
 <div class="toast" [ngClass]="toast().type" @toastAnimation>
     @if (toast().type === TOAST_TYPE.SUCCESS) {
-        <div class="toast-icon"><i class="fa-solid fa-check"></i></div>
+        <div class="toast-icon"><svg lucideCheck></svg></div>
     } @else {
-        <div class="toast-icon"><i class="fa-solid fa-xmark"></i></div>
+        <div class="toast-icon"><svg lucideX></svg></div>
     }
     <div class="toast-overlay success"></div>
     <div class="toast-message">{{ toast().message }}</div>

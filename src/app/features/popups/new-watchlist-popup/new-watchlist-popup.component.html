@@ -21,6 +21,7 @@
                     <app-input-dropdown
                         name="input-members"
                         id="input-members"
+                        class="input-members"
                         placeholder="Rechercher des amis"
                         [options]="membersOptions()"
                         titleOptions="Amis trouvés"
@@ -35,7 +36,7 @@
                                     (action)="removeMember(member)"
                                 >
                                     &#64; {{ member.value }}
-                                    <i class="fa-solid fa-xmark"></i>
+                                    <svg lucideCircleX></svg>
                                 </app-button>
                             }
                         </div>

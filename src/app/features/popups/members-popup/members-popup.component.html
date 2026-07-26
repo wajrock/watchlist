@@ -13,8 +13,9 @@
                             class="member-delete"
                             customClass="btn-cta"
                             (action)="removeMember(activeWatchlist().uidWatchlist, member.uid)"
-                            ><i class="fa-solid fa-trash"></i
-                        ></app-button>
+                        >
+                            <svg lucideTrash></svg>
+                        </app-button>
                     </div>
                 }
             </div>
@@ -22,7 +23,8 @@
                 class="members-invite"
                 customClass="btn-primary"
                 (action)="inviteFriendsActions()"
-                ><i class="fa-solid fa-users"></i>Inviter des amis</app-button
+            >
+                <svg lucideUsersRound></svg>Inviter des amis</app-button
             >
         </div>
     </div>

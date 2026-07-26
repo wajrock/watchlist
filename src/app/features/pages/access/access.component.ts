@@ -1,7 +1,8 @@
 import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { LucideArrowLeftToLine } from '@lucide/angular';
 import { firstValueFrom } from 'rxjs';
 import { filter, take } from 'rxjs/operators';
-import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { AuthService } from '../../../shared/services/auth/auth.service';
@@ -13,7 +14,7 @@ export enum ACCESS_VIEW {
 }
 @Component({
     selector: 'app-access',
-    imports: [ButtonComponent, InputComponent],
+    imports: [ButtonComponent, InputComponent, LucideArrowLeftToLine],
     templateUrl: './access.component.html',
     styleUrl: './access.component.scss',
 })

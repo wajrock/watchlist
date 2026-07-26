@@ -18,7 +18,7 @@
                         @for (member of selectedMembers(); track $index) {
                             <app-button customClass="btn-primary" (action)="removeMember(member)">
                                 &#64; {{ member.value }}
-                                <i class="fa-solid fa-xmark"></i>
+                                <svg lucideCircleX></svg>
                             </app-button>
                         }
                     </div>
@@ -29,7 +29,7 @@
                     class="members-invite"
                     customClass="btn-primary"
                     (action)="updateMembersList()"
-                    ><i class="fa-solid fa-users"></i>Inviter</app-button
+                    >Inviter</app-button
                 >
             }
         </div>

@@ -1,11 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { LucideSparkles } from '@lucide/angular';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { MergedMedia } from '../../../shared/models/firebase.models';
 import { CardInfo, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../shared/models/models';
 import { FilterService } from '../../../shared/services/filter/filter.service';
 import { NavbarService } from '../../../shared/services/navbar/navbar.service';
+import { ScrollService } from '../../../shared/services/scroll/scroll.service';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
 import { ClassicSearchComponent } from './classic-search/classic-search.component';
 import { MagicSearchComponent } from './magic-search/magic-search.component';
@@ -17,6 +19,7 @@ import { MagicSearchComponent } from './magic-search/magic-search.component';
         ButtonComponent,
         ClassicSearchComponent,
         MagicSearchComponent,
+        LucideSparkles,
     ],
     templateUrl: './search.component.html',
     styleUrl: './search.component.scss',
@@ -31,6 +34,7 @@ export class SearchComponent {
     private router = inject(Router);
     private navbarService = inject(NavbarService);
     protected filterService = inject(FilterService);
+    private scrollService = inject(ScrollService);
 
     // Signals
     selectedInfo = signal<CardInfo | null>(null);
@@ -45,7 +49,19 @@ export class SearchComponent {
 
     geminiSearchQuery = signal('');
 
+    // MISC.
+    @ViewChild('searchPage') searchPage!: ElementRef<HTMLDivElement>;
+
     // METHODS
+    constructor() {
+        this.scrollService.scrollToTop.subscribe((scrollToTop) => {
+            if (scrollToTop) {
+                this.searchPage.nativeElement.scrollTo(0, 0);
+                this.scrollService.shouldScrollToTop.set(false);
+            }
+        });
+    }
+
     switchView() {
         const newType =
             this.contentTypeFilter() === CONTENT_TYPE.MOVIE ? CONTENT_TYPE.TV : CONTENT_TYPE.MOVIE;

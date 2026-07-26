@@ -1,7 +1,7 @@
 <section class="popup-overlay" (click)="onBackgroundClick($event)">
     <main #popup class="popup" [class.animate]="animateOnInit()">
         <app-button class="popup-close btn.bordered" (click)="closePopup()"
-            ><i class="fa-solid fa-xmark"></i
+            ><svg lucideX></svg
         ></app-button>
 
         <ng-content class="popup-content"></ng-content>

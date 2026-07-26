@@ -1,4 +1,4 @@
-<main class="profile page">
+<main class="profile page" #profilePage>
     <div class="overlay"></div>
     <header class="page-header">
         <h1 class="page-title">Compte</h1>
@@ -7,7 +7,7 @@
             customClass="btn-default btn-bordered btn-round"
             (action)="logOut()"
         >
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <svg lucideLogOut></svg>
         </app-button>
     </header>
     <section class="profile-header">
@@ -76,7 +76,7 @@
                         [class.active]="historyFilter() === GRADE.LOVE"
                         (click)="historyFilter.set(GRADE.LOVE)"
                     >
-                        <i class="fa-regular fa-heart"></i>
+                        <svg lucideHeart></svg>
                     </div>
                 }
 
@@ -86,7 +86,7 @@
                         [class.active]="historyFilter() === GRADE.LIKE"
                         (click)="historyFilter.set(GRADE.LIKE)"
                     >
-                        <i class="fa-regular fa-thumbs-up"></i>
+                        <svg lucideThumbsUp></svg>
                     </div>
                 }
 
@@ -96,7 +96,7 @@
                         [class.active]="historyFilter() === GRADE.DONT_LIKE"
                         (click)="historyFilter.set(GRADE.DONT_LIKE)"
                     >
-                        <i class="fa-regular fa-thumbs-down"></i>
+                        <svg lucideThumbsDown></svg>
                     </div>
                 }
             </div>

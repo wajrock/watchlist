@@ -1,23 +1,34 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, signal, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { LucideHeart, LucideLogOut, LucideThumbsDown, LucideThumbsUp } from '@lucide/angular';
 import { documentId } from 'firebase/firestore';
 import { combineLatest, map, of, switchMap } from 'rxjs';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
-import { ApiMedia, EnrichedMedia, GRADE, User } from '../../../shared/models/firebase.models';
+import { ApiMedia, GRADE, User } from '../../../shared/models/firebase.models';
 import { CONTENT_TYPE, PROFILE_SECTION_VIEW } from '../../../shared/models/models';
 import { TOAST_TYPE } from '../../../shared/models/toast.model';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { CollectionService } from '../../../shared/services/collection/collection.service';
+import { ScrollService } from '../../../shared/services/scroll/scroll.service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
 import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 import { InvitationComponent } from './invitation/invitation.component';
 
 @Component({
     selector: 'app-profile',
-    imports: [ButtonComponent, AvatarComponent, InvitationComponent, CardComponent],
+    imports: [
+        ButtonComponent,
+        AvatarComponent,
+        InvitationComponent,
+        CardComponent,
+        LucideLogOut,
+        LucideHeart,
+        LucideThumbsDown,
+        LucideThumbsUp,
+    ],
     templateUrl: './profile.component.html',
     styleUrl: './profile.component.scss',
 })
@@ -31,6 +42,7 @@ export class ProfileComponent {
     private watchlistService = inject(WatchlistService);
     private collectionService = inject(CollectionService);
     private toastService = inject(ToastService);
+    private scrollService = inject(ScrollService);
 
     user = toSignal(this.authService.user$);
     watchlistInvitations = toSignal(this.watchlistService.watchlistInvitations$);
@@ -114,6 +126,17 @@ export class ProfileComponent {
             return allMedias.filter((media) => media.grade === filter);
         }
     });
+
+    @ViewChild('profilePage') profilePage!: ElementRef<HTMLDivElement>;
+
+    constructor() {
+        this.scrollService.scrollToTop.subscribe((scrollToTop) => {
+            if (scrollToTop) {
+                this.profilePage.nativeElement.scrollTo(0, 0);
+                this.scrollService.shouldScrollToTop.set(false);
+            }
+        });
+    }
 
     goBack(): void {
         this.router.navigate(['/'], { replaceUrl: true });

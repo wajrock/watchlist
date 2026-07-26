@@ -3,6 +3,7 @@ import { MediaActionsComponent } from './media-actions.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ACTIONS_VIEW, CONTENT_TYPE, PAGE_VIEW_TYPE } from '../../../../shared/models/models';
 import { GRADE } from '../../../../shared/models/firebase.models';
+import { LucideHeart, LucideThumbsDown, LucideThumbsUp } from '@lucide/angular';
 
 describe('MediaActionsComponent', () => {
     let component: MediaActionsComponent;
@@ -48,7 +49,7 @@ describe('MediaActionsComponent', () => {
             fixture.detectChanges();
 
             expect(component.gradesBtnContent()).toEqual({
-                icon: 'fa-heart',
+                icon: LucideHeart,
                 text: "J'adore",
             });
         });
@@ -58,7 +59,7 @@ describe('MediaActionsComponent', () => {
             fixture.detectChanges();
 
             expect(component.gradesBtnContent()).toEqual({
-                icon: 'fa-thumbs-up',
+                icon: LucideThumbsUp,
                 text: "J'aime",
             });
         });
@@ -68,7 +69,7 @@ describe('MediaActionsComponent', () => {
             fixture.detectChanges();
 
             expect(component.gradesBtnContent()).toEqual({
-                icon: 'fa-thumbs-down',
+                icon: LucideThumbsDown,
                 text: "J'aime pas",
             });
         });
@@ -82,7 +83,7 @@ describe('MediaActionsComponent', () => {
             fixture.detectChanges();
 
             expect(component.gradesBtnContent()).toEqual({
-                icon: 'fa-thumbs-up',
+                icon: LucideThumbsUp,
                 text: 'Noter ce film',
             });
         });
@@ -93,7 +94,7 @@ describe('MediaActionsComponent', () => {
             fixture.detectChanges();
 
             expect(component.gradesBtnContent()).toEqual({
-                icon: 'fa-thumbs-up',
+                icon: LucideThumbsUp,
                 text: 'Noter cette série',
             });
         });

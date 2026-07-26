@@ -1,18 +1,19 @@
 import { Component, inject, input, output } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
+import { LucideCirclePlus, LucideTrash } from '@lucide/angular';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { PopupComponent } from '../../../shared/components/popup/popup.component';
 import { WatchlistItem } from '../../../shared/models/firebase.models';
+import { TOAST_TYPE } from '../../../shared/models/toast.model';
 import { WatchlistMembersCountPipe } from '../../../shared/pipes/watchlist-members-count.pipe';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
-import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { CollectionService } from '../../../shared/services/collection/collection.service';
 import { ToastService } from '../../../shared/services/toast/toast.service';
-import { TOAST_TYPE } from '../../../shared/models/toast.model';
-import { Router } from '@angular/router';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 
 @Component({
     selector: 'app-watchlists-popup',
-    imports: [PopupComponent, ButtonComponent],
+    imports: [PopupComponent, ButtonComponent, LucideTrash, LucideCirclePlus],
     providers: [WatchlistMembersCountPipe],
     templateUrl: './watchlists-popup.component.html',
     styleUrl: './watchlists-popup.component.scss',

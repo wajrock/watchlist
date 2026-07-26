@@ -1,17 +1,18 @@
 import { Component, inject, output, resource, signal } from '@angular/core';
-import { CONTENT_TYPE } from '../../../../shared/models/models';
-import { FilterService } from '../../../../shared/services/filter/filter.service';
-import { ButtonComponent } from '../../../../shared/components/button/button.component';
-import { httpsCallable } from 'firebase/functions';
-import { SearchMovieDetails, SearchTvDetails } from '../../../../shared/models/tmdb.models';
-import { mapSearchToApiMedia } from '../../../../shared/utils/media.utils';
 import { Functions } from '@angular/fire/functions';
+import { LucideSearch } from '@lucide/angular';
+import { httpsCallable } from 'firebase/functions';
+import { ButtonComponent } from '../../../../shared/components/button/button.component';
 import { CardComponent } from '../../../../shared/components/card/card.component';
 import { ApiMedia } from '../../../../shared/models/firebase.models';
+import { CONTENT_TYPE } from '../../../../shared/models/models';
+import { SearchMovieDetails, SearchTvDetails } from '../../../../shared/models/tmdb.models';
+import { FilterService } from '../../../../shared/services/filter/filter.service';
+import { mapSearchToApiMedia } from '../../../../shared/utils/media.utils';
 
 @Component({
     selector: 'app-magic-search',
-    imports: [ButtonComponent, CardComponent],
+    imports: [ButtonComponent, CardComponent, LucideSearch],
     templateUrl: './magic-search.component.html',
     styleUrl: './magic-search.component.scss',
 })

@@ -1,18 +1,19 @@
 import { Component, computed, inject, input, output, signal } from '@angular/core';
-import { PopupComponent } from '../../../shared/components/popup/popup.component';
-import { InputDropdownComponent } from '../../../shared/components/input-dropdown/input-dropdown.component';
-import { ParamOptions } from '../../../shared/models/models';
-import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { UsersService } from '../../../shared/services/users/users.service';
+import { LucideCircleX } from '@lucide/angular';
+import { ButtonComponent } from '../../../shared/components/button/button.component';
+import { InputDropdownComponent } from '../../../shared/components/input-dropdown/input-dropdown.component';
+import { PopupComponent } from '../../../shared/components/popup/popup.component';
 import { EnrichedWatchlist, Member } from '../../../shared/models/firebase.models';
-import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
-import { ToastService } from '../../../shared/services/toast/toast.service';
+import { ParamOptions } from '../../../shared/models/models';
 import { TOAST_TYPE } from '../../../shared/models/toast.model';
+import { ToastService } from '../../../shared/services/toast/toast.service';
+import { UsersService } from '../../../shared/services/users/users.service';
+import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 
 @Component({
     selector: 'app-add-members-popup',
-    imports: [PopupComponent, InputDropdownComponent, ButtonComponent],
+    imports: [PopupComponent, InputDropdownComponent, ButtonComponent, LucideCircleX],
     templateUrl: './add-members-popup.component.html',
     styleUrl: './add-members-popup.component.scss',
 })

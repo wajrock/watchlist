@@ -17,10 +17,10 @@
                         </div>
                         <app-button
                             class="watchlist-delete"
-                            customClass="btn-cta"
+                            customClass="btn-cta btn-round"
                             (action)="removeWatchlist(watchlist.uidWatchlist)"
-                            ><i class="fa-solid fa-trash"></i
-                        ></app-button>
+                            ><svg lucideTrash></svg>
+                        </app-button>
                     </div>
                 }
             </div>
@@ -28,7 +28,7 @@
                 class="watchlists-add"
                 customClass="btn-primary"
                 (action)="createWatchlist()"
-                ><i class="fa-solid fa-add"></i>Créer une watchlist</app-button
+                ><svg lucideCirclePlus></svg>Créer une watchlist</app-button
             >
         </div>
     </div>

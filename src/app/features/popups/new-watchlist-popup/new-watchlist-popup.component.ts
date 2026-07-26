@@ -1,10 +1,11 @@
-import { Component, inject, output, signal, computed } from '@angular/core';
+import { Component, computed, inject, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LucideCircleX } from '@lucide/angular';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { InputDropdownComponent } from '../../../shared/components/input-dropdown/input-dropdown.component';
 import { InputComponent } from '../../../shared/components/input/input.component';
 import { PopupComponent } from '../../../shared/components/popup/popup.component';
-import { WatchlistItem, Member } from '../../../shared/models/firebase.models';
+import { Member, WatchlistItem } from '../../../shared/models/firebase.models';
 import { NEW_WATCHLIST_VIEW, ParamOptions } from '../../../shared/models/models';
 import { TOAST_TYPE } from '../../../shared/models/toast.model';
 import { AuthService } from '../../../shared/services/auth/auth.service';
@@ -16,7 +17,13 @@ import { formatName } from '../../../shared/utils/string.utils';
 
 @Component({
     selector: 'app-new-watchlist-popup',
-    imports: [PopupComponent, InputComponent, InputDropdownComponent, ButtonComponent],
+    imports: [
+        PopupComponent,
+        InputComponent,
+        InputDropdownComponent,
+        ButtonComponent,
+        LucideCircleX,
+    ],
     templateUrl: './new-watchlist-popup.component.html',
     styleUrl: './new-watchlist-popup.component.scss',
 })

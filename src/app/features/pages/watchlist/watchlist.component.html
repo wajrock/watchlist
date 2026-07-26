@@ -1,6 +1,6 @@
 @let activeWatchlist = this.activeWatchlist();
 @if (userWatchlists(); as lists) {
-    <main class="watchlist page">
+    <main class="watchlist page" #watchlistPage>
         <div class="overlay"></div>
 
         <header class="page-header">
@@ -10,7 +10,7 @@
                     customClass="btn btn-bordered"
                     (action)="openPopup(POPUP.WATCHLISTS)"
                 >
-                    <i class="fa-solid fa-bars-staggered"></i>Mes Watchlists
+                    <svg lucideLibraryBig></svg>Mes Watchlists
                 </app-button>
             }
         </header>
@@ -37,7 +37,7 @@
                 @if (membersCount) {
                     <div class="watchlist-members">
                         <app-button class="members-count" customClass="btn-default btn-bordered">
-                            <i class="fa-solid fa-users"></i>
+                            <svg lucideUsersRound></svg>
                             {{ membersCount }} Membre{{ membersCount > 1 ? 's' : '' }}
                         </app-button>
                         <app-button
@@ -45,7 +45,7 @@
                             customClass="btn-primary btn-bordered btn-round"
                             (action)="openPopup(POPUP.MEMBERS)"
                         >
-                            <i class="fa-solid fa-plus"></i>
+                            <svg lucideCirclePlus></svg>
                         </app-button>
                     </div>
                 }

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../shared/components/button/button.component';
 import { CardComponent } from '../../../shared/components/card/card.component';
 
+import { LucideCirclePlus, LucideLibraryBig, LucideUsersRound } from '@lucide/angular';
 import { EnrichedMedia, MergedMedia, WatchlistItem } from '../../../shared/models/firebase.models';
 import {
     CardInfo,
@@ -17,6 +18,7 @@ import {
 import { WatchlistMembersCountPipe } from '../../../shared/pipes/watchlist-members-count.pipe';
 import { AuthService } from '../../../shared/services/auth/auth.service';
 import { FilterService } from '../../../shared/services/filter/filter.service';
+import { ScrollService } from '../../../shared/services/scroll/scroll.service';
 import { WatchlistService } from '../../../shared/services/watchlist/watchlist.service';
 import { AddMembersPopupComponent } from '../../popups/add-members-popup/add-members-popup.component';
 import { MediaPopupDetailsComponent } from '../../popups/media-popup-details/media-popup-details.component';
@@ -35,6 +37,9 @@ import { WatchlistsPopupComponent } from '../../popups/watchlists-popup/watchlis
         WatchlistsPopupComponent,
         MembersPopupComponent,
         AddMembersPopupComponent,
+        LucideUsersRound,
+        LucideCirclePlus,
+        LucideLibraryBig,
     ],
     providers: [WatchlistMembersCountPipe],
     templateUrl: './watchlist.component.html',
@@ -71,6 +76,7 @@ export class WatchlistComponent {
     private watchlistService = inject(WatchlistService);
     private filterService = inject(FilterService);
     protected watchlistMembersCountPipe = inject(WatchlistMembersCountPipe);
+    private scrollService = inject(ScrollService);
 
     // SIGNALS
     readonly contentTypeFilter = this.filterService.contentType;
@@ -112,10 +118,20 @@ export class WatchlistComponent {
     );
 
     // OTHER
+    @ViewChild('watchlistPage') watchlistPage!: ElementRef<HTMLDivElement>;
     @ViewChild('watchlistWrapper') watchlistWrapper!: ElementRef<HTMLDivElement>;
     @ViewChild('dropdownMenu') dropdownMenu!: ElementRef<HTMLDivElement>;
 
     // METHODS
+    constructor() {
+        this.scrollService.scrollToTop.subscribe((scrollToTop) => {
+            if (scrollToTop) {
+                this.watchlistPage.nativeElement.scrollTo(0, 0);
+                this.scrollService.shouldScrollToTop.set(false);
+            }
+        });
+    }
+
     setContentType(contentType: CONTENT_TYPE) {
         this.filterService.setContentType(contentType);
         setTimeout(() => {

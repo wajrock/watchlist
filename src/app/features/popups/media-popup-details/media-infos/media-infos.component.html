@@ -21,16 +21,14 @@
 
         @if (mediaDetails.voteAverage > 0) {
             <div class="media-grade tag">
-                <i class="fa-regular fa-star"></i>
-                <p>
-                    {{ mediaDetails.voteAverage | displayRate }}
-                </p>
+                <svg lucideStar></svg>
+                <p>{{ mediaDetails.voteAverage | displayRate }}/5</p>
             </div>
         }
 
         @if (mediaDetails.provider) {
             <div class="media-platform tag">
-                <i class="fa-solid fa-tv"></i>
+                <svg lucideTvMinimal></svg>
                 <p>{{ mediaDetails.provider | displayProvider }}</p>
             </div>
         }

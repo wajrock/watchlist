@@ -1,4 +1,4 @@
-<main class="page search-wrapper">
+<main class="page search-wrapper" #searchPage>
     <div class="overlay"></div>
     <header class="page-header">
         <h1 class="page-title">Rechercher</h1>
@@ -7,7 +7,7 @@
             [customClass]="`${isMagicSearchActivated() ? 'btn-cta' : 'btn-default'} btn-bordered btn-round`"
             (action)="switchSearchType()"
         >
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <svg lucideSparkles></svg>
         </app-button>
     </header>
 

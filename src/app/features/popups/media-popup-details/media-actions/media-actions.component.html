@@ -8,18 +8,18 @@
             [disabled]="!mediaDetails.trailer"
             (action)="openTrailer.emit()"
         >
-            <i class="fa-solid fa-play"></i
-        ></app-button>
+            <svg lucidePlay></svg>
+        </app-button>
 
         <app-button customClass="btn-primary" (action)="add.emit()">
-            <i class="fa-solid fa-plus"></i>Ajouter</app-button
+            <svg lucideCirclePlus></svg>Ajouter</app-button
         >
 
         <app-button customClass="btn-default btn-bordered" (action)="updateSeenStatus.emit()">
             @if (mediaSeenStatus) {
-                <i class="fa-solid fa-eye" @viewIconAnimation></i>
+                <svg lucideEye @viewIconAnimation height="0"></svg>
             } @else {
-                <i class="fa-solid fa-eye-slash" @viewIconAnimation></i>
+                <svg lucideEyeOff @viewIconAnimation></svg>
             }
         </app-button>
     }
@@ -27,9 +27,9 @@
         @if (actionsView() === ACTION_VIEW.DEFAULT) {
             <app-button customClass="btn-default btn-bordered" (action)="updateSeenStatus.emit()">
                 @if (mediaSeenStatus) {
-                    <i class="fa-solid fa-eye" @viewIconAnimation></i>
+                    <svg lucideEye @viewIconAnimation height="0"></svg>
                 } @else {
-                    <i class="fa-solid fa-eye-slash" @viewIconAnimation></i>
+                    <svg lucideEyeOff @viewIconAnimation></svg>
                 }
             </app-button>
 
@@ -38,29 +38,29 @@
                     customClass="btn-primary"
                     (action)="changeActionsView.emit(ACTION_VIEW.GRADES)"
                 >
-                    <i class="fa-solid fa-heart" [ngClass]="gradesBtnContent().icon"></i
-                    >{{ gradesBtnContent().text }}
+                    <svg [lucideIcon]="gradesBtnContent().icon" class="active"></svg>
+                    {{ gradesBtnContent().text }}
                 </app-button>
             } @else {
                 @if (mediaDetails.trailer) {
                     <app-button customClass="btn-primary" (action)="openTrailer.emit()">
-                        <i class="fa-solid fa-play"></i>
+                        <svg lucidePlay class="active"></svg>
                         Bande-Annonce</app-button
                     >
                 }
             }
 
             <app-button customClass="btn-default btn-bordered" (action)="remove.emit()">
-                <i class="fa-solid fa-trash-can"></i
-            ></app-button>
+                <svg lucideTrash></svg>
+            </app-button>
         } @else {
             <div class="media-grades">
                 <app-button
                     customClass="btn-primary"
                     (action)="changeActionsView.emit(ACTION_VIEW.DEFAULT)"
                 >
-                    <i class="fa-solid fa-xmark"></i
-                ></app-button>
+                    <svg lucideCircleX></svg>
+                </app-button>
                 <app-button
                     (action)="updateGrade.emit(GRADE.DONT_LIKE)"
                     [customClass]="
@@ -68,13 +68,7 @@
                         (mediaGrade === GRADE.DONT_LIKE ? 'btn-bordered-active' : '')
                     "
                 >
-                    <i
-                        [class]="
-                            mediaGrade === GRADE.DONT_LIKE
-                                ? 'fa-solid fa-thumbs-down'
-                                : 'fa-regular fa-thumbs-down'
-                        "
-                    ></i>
+                    <svg lucideThumbsDown></svg>
                 </app-button>
 
                 <app-button
@@ -83,13 +77,7 @@
                         'btn-bordered ' + (mediaGrade === GRADE.LIKE ? 'btn-bordered-active' : '')
                     "
                 >
-                    <i
-                        [class]="
-                            mediaGrade === GRADE.LIKE
-                                ? 'fa-solid fa-thumbs-up'
-                                : 'fa-regular fa-thumbs-up'
-                        "
-                    ></i>
+                    <svg lucideThumbsUp></svg>
                 </app-button>
 
                 <app-button
@@ -98,11 +86,7 @@
                         'btn-bordered ' + (mediaGrade === GRADE.LOVE ? 'btn-bordered-active' : '')
                     "
                 >
-                    <i
-                        [class]="
-                            mediaGrade === GRADE.LOVE ? 'fa-solid fa-heart' : 'fa-regular fa-heart'
-                        "
-                    ></i>
+                    <svg lucideHeart></svg>
                 </app-button>
             </div>
         }

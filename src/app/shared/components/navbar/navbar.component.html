@@ -1,18 +1,41 @@
 <nav class="navbar">
-    <a class="navbar-item" routerLink="/watchlist" routerLinkActive="active" replaceUrl="true">
-        <span class="navbar-icon"><i class="fa-regular fa-bookmark"></i></span>
+    <a
+        class="navbar-item"
+        routerLink="/watchlist"
+        (click)="scrollService.shouldScrollToTop.set(true)"
+        routerLinkActive="active"
+    >
+        <svg class="navbar-icon" lucideLibraryBig></svg>
         <span class="navbar-label">Watchlists</span>
     </a>
-    <a class="navbar-item" routerLink="/trendings" routerLinkActive="active" replaceUrl="true">
-        <span class="navbar-icon"><i class="fa-solid fa-fire"></i></span>
+
+    <a
+        class="navbar-item"
+        routerLink="/trendings"
+        (click)="scrollService.shouldScrollToTop.set(true)"
+        routerLinkActive="active"
+    >
+        <svg class="navbar-icon" lucideFlame></svg>
         <span class="navbar-label">Tendances</span>
     </a>
-    <a class="navbar-item" routerLink="/search" routerLinkActive="active" replaceUrl="true">
-        <span class="navbar-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+
+    <a
+        class="navbar-item"
+        routerLink="/search"
+        (click)="scrollService.shouldScrollToTop.set(true)"
+        routerLinkActive="active"
+    >
+        <svg class="navbar-icon" lucideSearch></svg>
         <span class="navbar-label">Rechercher</span>
     </a>
-    <a class="navbar-item" routerLink="/profile" routerLinkActive="active" replaceUrl="true">
-        <span class="navbar-icon"><i class="fa-regular fa-user"></i></span>
+
+    <a
+        class="navbar-item"
+        routerLink="/profile"
+        (click)="scrollService.shouldScrollToTop.set(true)"
+        routerLinkActive="active"
+    >
+        <svg class="navbar-icon" lucideUserRound></svg>
         <span class="navbar-label">Compte</span>
     </a>
 </nav>

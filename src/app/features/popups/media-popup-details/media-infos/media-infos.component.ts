@@ -1,12 +1,13 @@
 import { Component, input } from '@angular/core';
+import { LucideStar, LucideTvMinimal } from '@lucide/angular';
 import { ApiMedia } from '../../../../shared/models/firebase.models';
 import { PAGE_VIEW_TYPE } from '../../../../shared/models/models';
-import { DisplayRatePipe } from '../../../../shared/pipes/display-rate.pipe';
 import { DisplayProviderPipe } from '../../../../shared/pipes/display-provider.pipe';
+import { DisplayRatePipe } from '../../../../shared/pipes/display-rate.pipe';
 
 @Component({
     selector: 'app-media-infos',
-    imports: [DisplayRatePipe, DisplayProviderPipe],
+    imports: [DisplayRatePipe, DisplayProviderPipe, LucideStar, LucideTvMinimal],
     templateUrl: './media-infos.component.html',
     styleUrl: './media-infos.component.scss',
 })

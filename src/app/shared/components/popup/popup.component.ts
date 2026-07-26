@@ -13,12 +13,13 @@ import {
     signal,
     ViewChild,
 } from '@angular/core';
+import { LucideX } from '@lucide/angular';
 import { NavbarService } from '../../services/navbar/navbar.service';
 import { ButtonComponent } from '../button/button.component';
 
 @Component({
     selector: 'app-popup',
-    imports: [CommonModule, ButtonComponent],
+    imports: [CommonModule, ButtonComponent, LucideX],
     templateUrl: './popup.component.html',
     styleUrl: './popup.component.scss',
 })
